@@ -32,3 +32,8 @@ c4model.com
 ![](http://yuml.me/diagram/scruffy/class/[Customer]<>1->*[Order] "yUML")
 
 ![](http://yuml.me/diagram/scruffy/class/[API Gateway]<-[Service Discovery],[Service Discovery]<->[Microservices chassis service client],[Service Discovery]<-[Diagnostics],[Service Discovery]<-[Configuration Coordination],[Microservices chassis service client]<-[Configuration Coordination],[Diagnostics]<-[Configuration Coordination],[Diagnostics]->[Microservices chassis service client],[API Gateway]<-[Configuration Coordination] "yUML")
+
+
+<img src="http://yuml.me/diagram/scruffy/class/[Account]++owner-0..*>[Repository]"/>
+
+<img src="http://yuml.me/diagram/scruffy/class/[API Gateway]<-[Service Discovery],[Service Discovery]<->[Microservices chassis service client],[Service Discovery]<-[Diagnostics],[Service Discovery]<-[Configuration Coordination],[Microservices chassis service client]<-[Configuration Coordination],[Diagnostics]<-[Configuration Coordination],[Diagnostics]->[Microservices chassis service client],[API Gateway]<-[Configuration Coordination]"/>
