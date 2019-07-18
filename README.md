@@ -16,9 +16,7 @@ We will cover:
 
 <img src="http://yuml.me/diagram/scruffy/class/[API Gateway]<-[Service Discovery],[Service Discovery]<->[Microservices chassis service client],[Service Discovery]<-[Diagnostics and monitoring],[Service Discovery]<-[Configuration Coordination],[Microservices chassis service client]<-[Configuration Coordination],[Diagnostics and monitoring]<-[Configuration Coordination],[Diagnostics and monitoring]->[Microservices chassis service client],[API Gateway]<-[Configuration Coordination]"/>
 
-<img src="http://yuml.me/diagram/scruffy/class/[API Gateway    How to access endpoints from the outside{bg:cornsilk}],[Configuration and coordination    How to provide cluster whide configuration and consensus{bg:cornsilk}],[Service discovery    How to expose and find service endpoints{bg:cornsilk}]"/>
-
-<img src="http://yuml.me/diagram/scruffy/class/[Microservice chassis    How to execute an ops component{bg:cornsilk}],[Microservice chassis    How to call other services in a resilient and responsive way{bg:cornsilk}],[Diagnostics and monitoring    How to detect operational anomalies{bg:cornsilk}]"/>
+<img src="http://yuml.me/diagram/scruffy/class/[API Gateway    How to access endpoints from the outside{bg:cornsilk}],[Configuration and coordination    How to provide cluster whide configuration and consensus{bg:cornsilk}],[Service discovery    How to expose and find service endpoints{bg:cornsilk}],[Microservice chassis    How to execute an ops component{bg:cornsilk}],[Microservice chassis    How to call other services in a resilient and responsive way{bg:cornsilk}],[Diagnostics and monitoring    How to detect operational anomalies{bg:cornsilk}]"/>
 
 ````
 Diagrams written with yuml.me
