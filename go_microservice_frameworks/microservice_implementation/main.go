@@ -40,6 +40,14 @@ func main()  {
 		}
 	})
 
+	// Serve static files and templates
+	engine.LoadHTMLGlob("./templates/*.html")
+	engine.StaticFile("/favicon.ico", "./favicon.ico")
+
+	engine.GET("/", func(c *gin.Context) {
+		c.HTML(http.StatusOK, "index.html", gin.H{"title": "Cloud implemented with Go using the Gin framework"})
+	})
+
 	// Get car by carID
 	engine.GET("/api/cars/:carid", func(c *gin.Context) {
 		carID := c.Params.ByName("carid")

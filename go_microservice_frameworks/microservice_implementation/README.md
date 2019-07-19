@@ -1,11 +1,20 @@
 # Microservice implementation
 
+#### Table Of Contents
+1. [Document objective](#1-document-objective)
+2. [Implemented endpoints](#2-implemented-endpoints)
+3. [Containerizing the application with Docker](#3-containerizing-the-application-with-docker)
+4. [Exercises](#4-exercises)
+
+## 1 Document objective
+
 In this block we are going to use Golang and the Gin-Gonic framework to:
  
 * Implement a basic HTTP microservice service with configurable port
 * Implement a basic routing logic for different paths and verbs
 * Implement JSON request and response processing
 
+## 2 Implemented endpoints
 
 We are importing the Gin Gonic framework to do so:
 
@@ -101,7 +110,28 @@ arturotarin@QOSMIO-X70B:~/go/src/github.com/ArturoTarinVillaescusa/go_cloud_orch
 
 ```
 
+Modify a car:
+```
+arturotarin@QOSMIO-X70B:~/go/src/github.com/ArturoTarinVillaescusa/go_cloud_orchestration/go_microservice_frameworks/microservice_implementation
+11:02:56 $ curl -d '{"id":"00001","manufacturer":"Renault","model":"6"}' -H "Content-Type: application/json" -X PUT curl localhost:8080/api/cars/00001
 
+arturotarin@QOSMIO-X70B:~/go/src/github.com/ArturoTarinVillaescusa/go_cloud_orchestration/go_microservice_frameworks/microservice_implementation
+11:03:32 $ curl localhost:8080/api/cars/00001
+{"id":"00001","manufacturer":"Renault","model":"6"}
 ```
+
+Delete a car:
 ```
+oservice_implementation
+11:04:54 $ curl -X DELETE curl localhost:8080/api/cars/00001curl: (6) Could not resolve host: curl
+
+arturotarin@QOSMIO-X70B:~/go/src/github.com/ArturoTarinVillaescusa/go_cloud_orchestration/go_microservice_frameworks/microservice_implementation
+11:05:45 $ curl localhost:8080/api/cars/00001
+
+arturotarin@QOSMIO-X70B:~/go/src/github.com/ArturoTarinVillaescusa/go_cloud_orchestration/go_microservice_frameworks/microservice_implementation
+11:05:49 $ curl localhost:8080/api/cars
+[{"id":"0345391802","manufacturer":"Ford","model":"Galaxy"},{"id":"0000000000","manufacturer":"Porsche","model":"Carrera"}]
+```
+
+## 3 Containerizing the application with Docker
 
