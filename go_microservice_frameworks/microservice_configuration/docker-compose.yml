@@ -1,0 +1,15 @@
+version: '2'
+
+services:
+  consul:
+    image: consul:latest
+    ports:
+      - "8300:8300"
+      - "8400:8400"
+      - "8500:8500"
+    networks:
+      - my-net
+
+networks:
+  my-net:
+    driver: bridge
