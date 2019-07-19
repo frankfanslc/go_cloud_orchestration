@@ -615,6 +615,40 @@ tomcat-56ff5c79c5-znl24                              1/1       Running   1      
 zk-0                                                 1/1       Running   10         331d
 ```
 
+List of the services:
+```
+arturotarin@QOSMIO-X70B:~/go/src/github.com/ArturoTarinVillaescusa/go_cloud_orchestration/go_microservice_frameworks/microservice_implementation
+13:44:28 $ kubectl get services
+NAME                                         TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)             AGE
+goldcar-alpakka-kafka-microservice-service   NodePort    10.99.105.212   <none>        8080:32000/TCP      331d
+kafka-hs                                     ClusterIP   None            <none>        9093/TCP            331d
+kubernetes                                   ClusterIP   10.96.0.1       <none>        443/TCP             331d
+microservice-in-go                           NodePort    10.103.95.38    <none>        9090:31489/TCP      6m
+philips-microservice-service                 NodePort    10.106.207.39   <none>        8083:31000/TCP      291d
+tomcat                                       NodePort    10.105.69.168   <none>        8080:31723/TCP      90d
+tomcat-service                               NodePort    10.103.30.100   <none>        8080:31234/TCP      90d
+zk-cs                                        ClusterIP   10.99.168.219   <none>        2181/TCP            331d
+zk-hs                                        ClusterIP   None            <none>        2888/TCP,3888/TCP   331d
+```
+
+SSHing into Minikube we can test the deployed services:
+
+```
+arturotarin@QOSMIO-X70B:~/go/src/github.com/ArturoTarinVillaescusa/go_cloud_orchestration/go_microservice_frameworks/microservice_implementation
+13:46:40 $ minikube ssh
+                         _             _            
+            _         _ ( )           ( )           
+  ___ ___  (_)  ___  (_)| |/')  _   _ | |_      __  
+/' _ ` _ `\| |/' _ `\| || , <  ( ) ( )| '_`\  /'__`\
+| ( ) ( ) || || ( ) || || |\`\ | (_) || |_) )(  ___/
+(_) (_) (_)(_)(_) (_)(_)(_) (_)`\___/'(_,__/'`\____)
+
+$ curl 10.103.95.38:9090/ping
+pong
+
+$ curl 10.103.95.38:9090/api/cars
+[{"id":"0345391802","manufacturer":"Ford","model":"Galaxy"},{"id":"0000000000","manufacturer":"Porsche","model":"Carrera"}]
+```
 
 Open Minikube UI:
 
