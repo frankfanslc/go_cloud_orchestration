@@ -26,9 +26,9 @@ spec:
           requests:
             memory: "64Mi"
             cpu: "125m"
-          limits:
-            memory: "128Mi"
-            cpu: "250m"
+         # limits:
+         #   memory: "128Mi"
+         #   cpu: "250m"
 
         # check of gin-web is alive and healthy
         readinessProbe:

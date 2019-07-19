@@ -631,7 +631,36 @@ zk-cs                                        ClusterIP   10.99.168.219   <none> 
 zk-hs                                        ClusterIP   None            <none>        2888/TCP,3888/TCP   331d
 ```
 
-SSHing into Minikube we can test the deployed services:
+We can scale the number of pods of a service:
+
+```
+arturotarin@QOSMIO-X70B:~/go/src/github.com/ArturoTarinVillaescusa/go_cloud_orchestration/go_microservice_frameworks/microservice_implementation
+13:51:33 $ kubectl scale deployment microservice-in-go --replicas=3
+deployment "microservice-in-go" scaled
+
+arturotarin@QOSMIO-X70B:~/go/src/github.com/ArturoTarinVillaescusa/go_cloud_orchestration/go_microservice_frameworks/microservice_implementation
+13:56:35 $ kubectl get deployments microservice-in-go
+NAME                 DESIRED   CURRENT   UP-TO-DATE   AVAILABLE   AGE
+microservice-in-go   3         3         3            3           19m
+```
+
+We can access the microservice-in-go service from my machine:
+
+```
+arturotarin@QOSMIO-X70B:~/go/src/github.com/ArturoTarinVillaescusa/go_cloud_orchestration/go_microservice_frameworks/microservice_implementation
+13:50:20 $ minikube service microservice-in-go
+Opening kubernetes service default/microservice-in-go in default browser...
+
+arturotarin@QOSMIO-X70B:~/go/src/github.com/ArturoTarinVillaescusa/go_cloud_orchestration/go_microservice_frameworks/microservice_implementation
+13:50:44 $ curl http://192.168.99.100:31489/ping
+pong
+arturotarin@QOSMIO-X70B:~/go/src/github.com/ArturoTarinVillaescusa/go_cloud_orchestration/go_microservice_frameworks/microservice_implementation
+13:51:05 $ curl http://192.168.99.100:31489/api/cars
+[{"id":"0345391802","manufacturer":"Ford","model":"Galaxy"},{"id":"0000000000","manufacturer":"Porsche","model":"Carrera"}]
+```
+
+
+And also can access it SSHing into Minikube:
 
 ```
 arturotarin@QOSMIO-X70B:~/go/src/github.com/ArturoTarinVillaescusa/go_cloud_orchestration/go_microservice_frameworks/microservice_implementation
