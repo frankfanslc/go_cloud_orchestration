@@ -5,7 +5,7 @@ metadata:
   labels:
     app: microservice-in-go
 spec:
-  replicas: 3
+  replicas: 1
   template:
     metadata:
       labels:
@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: microservice-in-go
-        image: "go-microservice:1.0.1"
+        image: "go-microservice:1.0.0"
         ports:
         - containerPort: 9090
         env:
@@ -30,9 +30,6 @@ spec:
             memory: "128Mi"
             cpu: "250m"
 
-        # for faster SIGKILL shutdown
-        terminationGracePeriodSeconds: 5
-        
         # check of gin-web is alive and healthy
         readinessProbe:
           httpGet:
