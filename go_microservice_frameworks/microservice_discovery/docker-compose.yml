@@ -1,0 +1,36 @@
+version: '2'
+
+services:
+  consul:
+    image: consul:latest
+    ports:
+      - "8300:8300"
+      - "8400:8400"
+      - "8500:8500"
+    links:
+      - microservice-in-go-01
+      - microservice-in-go-02
+    networks:
+      - my-net
+
+  microservice-in-go-01:
+    image: go-microservice:1.0.0
+    environment:
+      - PORT=8080
+    ports:
+      - "8080:8080"
+    networks:
+      - my-net
+
+  microservice-in-go-02:
+    image: go-microservice:1.0.0
+    environment:
+      - PORT=9090
+    ports:
+      - "9090:9090"
+    networks:
+      - my-net
+
+networks:
+  my-net:
+    driver: bridge

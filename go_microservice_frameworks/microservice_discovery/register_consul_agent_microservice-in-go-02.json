@@ -1,0 +1,18 @@
+{
+  "ID": "microservice-in-go-02",
+  "Name": "microservice-in-go",
+  "Tags": [
+    "cloud-native-go",
+    "v1"
+  ],
+  "Address": "localhost",
+  "Port": 9090,
+  "EnableTagOverride": false,
+  "check": {
+    "id": "ping",
+    "name": "HTTP API on port 9090",
+    "http": "http://microservice-in-go-02:9090/ping",
+    "interval": "5s",
+    "timeout": "1s"
+  }
+}

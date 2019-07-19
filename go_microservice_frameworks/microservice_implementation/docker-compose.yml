@@ -2,7 +2,7 @@ version: '2'
 services:
   microservice-in-go:
     build: .
-    image: go-microservice:1.0.1
+    image: go-microservice:1.0.0
     environment:
       - PORT=8080
     ports:

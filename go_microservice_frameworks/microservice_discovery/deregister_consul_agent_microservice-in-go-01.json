@@ -1,0 +1,17 @@
+{
+  "ID": "microservice-in-go-01",
+  "Name": "microservice-in-go",
+  "Tags": [
+    "cloud-native-go",
+    "v1"
+  ],
+  "Address": "microservice-in-go-01",
+  "Port": 8080,
+  "EnableTagOverride": false,
+  "Check": {
+    "DeregisterCriticalServiceAfter": "5m",
+    "HTTP": "http://localhost:8080/ping",
+    "Interval": "10s",
+    "TTL": "15s"
+  }
+}
