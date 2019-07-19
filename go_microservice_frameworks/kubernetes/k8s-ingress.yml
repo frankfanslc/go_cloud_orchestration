@@ -1,0 +1,11 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: microservice-in-go
+  labels:
+    app: microservice-in-go
+    tier: frontend
+spec:
+  backend:
+    serviceName: microservice-in-go
+    servicePort: 9090
