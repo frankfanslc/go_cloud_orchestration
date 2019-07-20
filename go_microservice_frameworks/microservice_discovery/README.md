@@ -654,7 +654,14 @@ consul_1         |     2019/07/20 06:13:58 [DEBUG] agent: Check "service:go-micr
 
 ## 6 Go microservices lookup with Consul
 
-We can see this from the Consul UI:
+In this section we will:
+
+* Lookup the Go server microservice using Consul UI and Consul REST API calls
+* Implement a client microservice application with Go
+* Implement a service endpoint lookup via Consul
+* Run Consul and our client and server Go microservices all together and see that our development works as expected
+
+So this is what we can see this from either the Consul UI or from command line Consul REST API calls:
 
 ![alt text](images/image03.png "go-microservice-server has been registered using Go")
 
