@@ -706,7 +706,6 @@ arturotarin@QOSMIO-X70B:~/go/src/github.com/ArturoTarinVillaescusa/go_cloud_orch
 total 15M
 -rw-rw-r-- 1 arturotarin arturotarin  570 jul 20 16:54 Dockerfile
 -rw-rw-r-- 1 arturotarin arturotarin 1,3K jul 20 18:38 client.go
--rwxrwxr-x 1 arturotarin arturotarin 7,2M jul 20 18:38 client
 -rwxrwxr-x 1 arturotarin arturotarin 7,2M jul 20 18:38 go-microservice-client
 ```
 
