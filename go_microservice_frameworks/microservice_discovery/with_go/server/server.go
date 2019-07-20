@@ -10,14 +10,14 @@ import (
 )
 
 func main() {
-	registerServiceWithConsul()
+	registerServiceInConsul()
 
 	fmt.Println("Starting Go microservice server.")
 	http.HandleFunc("/info", info)
 	http.ListenAndServe(port(), nil)
 }
 
-func registerServiceWithConsul() {
+func registerServiceInConsul() {
 	config := consulapi.DefaultConfig()
 	consul, err := consulapi.NewClient(config)
 	if err != nil {

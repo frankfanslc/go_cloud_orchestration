@@ -693,5 +693,183 @@ arturotarin@QOSMIO-X70B:~/go/src/github.com/ArturoTarinVillaescusa/go_cloud_orch
 ```
 
 But the good thing is that a Go microservice client like the provided in our example can find the 
-Go microservice server example using the Consul APIs as well. Let's see how:
+Go microservice server example using the Consul APIs as well. Let's see how.
+
+First, build the go-microservice-client and test it locally:
+
+```
+arturotarin@QOSMIO-X70B:~/go/src/github.com/ArturoTarinVillaescusa/go_cloud_orchestration/go_microservice_frameworks/microservice_discovery/with_go/client
+18:38:26 $ go build -o go-microservice-client
+
+arturotarin@QOSMIO-X70B:~/go/src/github.com/ArturoTarinVillaescusa/go_cloud_orchestration/go_microservice_frameworks/microservice_discovery/with_go/client
+18:38:48 $ ls -lrth
+total 15M
+-rw-rw-r-- 1 arturotarin arturotarin  570 jul 20 16:54 Dockerfile
+-rw-rw-r-- 1 arturotarin arturotarin 1,3K jul 20 18:38 client.go
+-rwxrwxr-x 1 arturotarin arturotarin 7,2M jul 20 18:38 client
+-rwxrwxr-x 1 arturotarin arturotarin 7,2M jul 20 18:38 go-microservice-client
+```
+
+Test it locally:
+
+```
+arturotarin@QOSMIO-X70B:~/go/src/github.com/ArturoTarinVillaescusa/go_cloud_orchestration/go_microservice_frameworks/microservice_discovery/with_go/client
+18:38:50 $ ./go-microservice-client 
+Starting Go microservice client.
+```
+
+And see what is going on in Consul log:
+
+```
+consul_1                  |     2019/07/20 16:40:47 [DEBUG] http: Request GET /v1/agent/services (1.167346ms) from=172.29.0.1:48308
+```
+
+Now let's add this block in the docker-compose.yml file (already done):
+
+```
+  go-microservice-client:
+    build:
+      context: .
+      dockerfile: client/Dockerfile
+    image: go-microservice-client:1.0.0
+    environment:
+      - CONSUL_HTTP_ADDR=consul:8500
+    depends_on:
+      - consul
+      - go-microservice-server
+    networks:
+      - my-net
+```
+
+And run the three all together, Consul, go-microservice-server and go-microservice-client:
+
+```
+arturotarin@QOSMIO-X70B:~/go/src/github.com/ArturoTarinVillaescusa/go_cloud_orchestration/go_microservice_frameworks/microservice_discovery/with_go
+19:51:33 $ docker-compose up
+Creating withgo_consul_1 ... done
+Creating withgo_go-microservice-server_1 ... done
+Creating withgo_go-microservice-client_1 ... done
+Attaching to withgo_consul_1, withgo_go-microservice-server_1, withgo_go-microservice-client_1
+consul_1                  | ==> Starting Consul agent...
+consul_1                  |            Version: 'v1.5.2'
+consul_1                  |            Node ID: 'a8a393e2-f416-f7e0-6945-622760ea7d1a'
+consul_1                  |          Node name: 'b0aa3906d740'
+consul_1                  |         Datacenter: 'dc1' (Segment: '<all>')
+consul_1                  |             Server: true (Bootstrap: false)
+consul_1                  |        Client Addr: [0.0.0.0] (HTTP: 8500, HTTPS: -1, gRPC: 8502, DNS: 8600)
+go-microservice-server_1  | Starting Go microservice server.
+go-microservice-client_1  | Starting Go microservice client.
+consul_1                  |       Cluster Addr: 127.0.0.1 (LAN: 8301, WAN: 8302)
+consul_1                  |            Encrypt: Gossip: false, TLS-Outgoing: false, TLS-Incoming: false, Auto-Encrypt-TLS: false
+consul_1                  | 
+consul_1                  | ==> Log data will now stream in as it occurs:
+consul_1                  | 
+consul_1                  |     2019/07/20 17:51:42 [DEBUG] agent: Using random ID "a8a393e2-f416-f7e0-6945-622760ea7d1a" as node ID
+consul_1                  |     2019/07/20 17:51:42 [DEBUG] tlsutil: Update with version 1
+go-microservice-server_1  | The /info endpoint is being called...
+consul_1                  |     2019/07/20 17:51:42 [DEBUG] tlsutil: OutgoingRPCWrapper with version 1
+consul_1                  |     2019/07/20 17:51:42 [INFO]  raft: Initial configuration (index=1): [{Suffrage:Voter ID:a8a393e2-f416-f7e0-6945-622760ea7d1a Address:127.0.0.1:8300}]
+consul_1                  |     2019/07/20 17:51:42 [INFO]  raft: Node at 127.0.0.1:8300 [Follower] entering Follower state (Leader: "")
+consul_1                  |     2019/07/20 17:51:42 [INFO] serf: EventMemberJoin: b0aa3906d740.dc1 127.0.0.1
+consul_1                  |     2019/07/20 17:51:42 [INFO] serf: EventMemberJoin: b0aa3906d740 127.0.0.1
+consul_1                  |     2019/07/20 17:51:42 [INFO] consul: Adding LAN server b0aa3906d740 (Addr: tcp/127.0.0.1:8300) (DC: dc1)
+consul_1                  |     2019/07/20 17:51:42 [INFO] consul: Handled member-join event for server "b0aa3906d740.dc1" in area "wan"
+consul_1                  |     2019/07/20 17:51:42 [DEBUG] agent/proxy: managed Connect proxy manager started
+consul_1                  |     2019/07/20 17:51:42 [INFO] agent: Started DNS server 0.0.0.0:8600 (tcp)
+consul_1                  |     2019/07/20 17:51:42 [INFO] agent: Started DNS server 0.0.0.0:8600 (udp)
+consul_1                  |     2019/07/20 17:51:42 [INFO] agent: Started HTTP server on [::]:8500 (tcp)
+consul_1                  |     2019/07/20 17:51:42 [INFO] agent: Started gRPC server on [::]:8502 (tcp)
+consul_1                  |     2019/07/20 17:51:42 [INFO] agent: started state syncer
+consul_1                  | ==> Consul agent running!
+consul_1                  |     2019/07/20 17:51:42 [WARN]  raft: Heartbeat timeout from "" reached, starting election
+consul_1                  |     2019/07/20 17:51:42 [INFO]  raft: Node at 127.0.0.1:8300 [Candidate] entering Candidate state in term 2
+consul_1                  |     2019/07/20 17:51:42 [DEBUG] raft: Votes needed: 1
+consul_1                  |     2019/07/20 17:51:42 [DEBUG] raft: Vote granted from a8a393e2-f416-f7e0-6945-622760ea7d1a in term 2. Tally: 1
+consul_1                  |     2019/07/20 17:51:42 [INFO]  raft: Election won. Tally: 1
+consul_1                  |     2019/07/20 17:51:42 [INFO]  raft: Node at 127.0.0.1:8300 [Leader] entering Leader state
+consul_1                  |     2019/07/20 17:51:42 [INFO] consul: cluster leadership acquired
+consul_1                  |     2019/07/20 17:51:42 [INFO] consul: New leader elected: b0aa3906d740
+consul_1                  |     2019/07/20 17:51:42 [INFO] connect: initialized primary datacenter CA with provider "consul"
+consul_1                  |     2019/07/20 17:51:42 [DEBUG] consul: Skipping self join check for "b0aa3906d740" since the cluster is too small
+consul_1                  |     2019/07/20 17:51:42 [INFO] consul: member 'b0aa3906d740' joined, marking health alive
+consul_1                  |     2019/07/20 17:51:43 [DEBUG] agent: Skipping remote check "serfHealth" since it is managed automatically
+consul_1                  |     2019/07/20 17:51:43 [INFO] agent: Synced node info
+consul_1                  |     2019/07/20 17:51:43 [DEBUG] agent: Node info in sync
+consul_1                  |     2019/07/20 17:51:44 [DEBUG] tlsutil: OutgoingRPCWrapper with version 1
+consul_1                  |     2019/07/20 17:51:45 [DEBUG] agent: Skipping remote check "serfHealth" since it is managed automatically
+consul_1                  |     2019/07/20 17:51:45 [DEBUG] agent: Node info in sync
+consul_1                  |     2019/07/20 17:51:46 [DEBUG] tlsutil: OutgoingTLSConfigForCheck with version 1
+consul_1                  |     2019/07/20 17:51:46 [INFO] agent: Synced service "go-microservice-server"
+consul_1                  |     2019/07/20 17:51:46 [DEBUG] agent: Check "service:go-microservice-server" in sync
+consul_1                  |     2019/07/20 17:51:46 [DEBUG] agent: Node info in sync
+consul_1                  |     2019/07/20 17:51:46 [DEBUG] http: Request PUT /v1/agent/service/register (404.693622ms) from=172.29.0.3:42478
+consul_1                  |     2019/07/20 17:51:46 [DEBUG] agent: Service "go-microservice-server" in sync
+consul_1                  |     2019/07/20 17:51:46 [DEBUG] agent: Check "service:go-microservice-server" in sync
+consul_1                  |     2019/07/20 17:51:46 [DEBUG] agent: Node info in sync
+consul_1                  |     2019/07/20 17:51:49 [DEBUG] agent: Check "service:go-microservice-server" is passing
+consul_1                  |     2019/07/20 17:51:49 [DEBUG] agent: Service "go-microservice-server" in sync
+consul_1                  |     2019/07/20 17:51:49 [INFO] agent: Synced check "service:go-microservice-server"
+consul_1                  |     2019/07/20 17:51:49 [DEBUG] agent: Node info in sync
+consul_1                  |     2019/07/20 17:51:49 [DEBUG] http: Request GET /v1/agent/services (1.182676ms) from=172.29.0.4:39862
+go-microservice-server_1  | The /info endpoint is being called...
+consul_1                  |     2019/07/20 17:51:54 [DEBUG] agent: Check "service:go-microservice-server" is passing
+go-microservice-server_1  | The /info endpoint is being called...
+go-microservice-client_1  | Congratulations: you have obtained a bunch of really valuable information after you've called the /info endpoint. Time is 2019-07-20 17:51:54.839648149 +0000 UTC m=+5.003828300
+go-microservice-server_1  | The /info endpoint is being called...
+consul_1                  |     2019/07/20 17:51:59 [DEBUG] agent: Check "service:go-microservice-server" is passing
+go-microservice-server_1  | The /info endpoint is being called...
+go-microservice-client_1  | Congratulations: you have obtained a bunch of really valuable information after you've called the /info endpoint. Time is 2019-07-20 17:51:59.839703835 +0000 UTC m=+10.003884007
+go-microservice-server_1  | The /info endpoint is being called...
+consul_1                  |     2019/07/20 17:52:04 [DEBUG] agent: Check "service:go-microservice-server" is passing
+go-microservice-server_1  | The /info endpoint is being called...
+go-microservice-client_1  | Congratulations: you have obtained a bunch of really valuable information after you've called the /info endpoint. Time is 2019-07-20 17:52:04.839611529 +0000 UTC m=+15.003791742
+go-microservice-server_1  | The /info endpoint is being called...
+consul_1                  |     2019/07/20 17:52:09 [DEBUG] agent: Check "service:go-microservice-server" is passing
+go-microservice-server_1  | The /info endpoint is being called...
+go-microservice-client_1  | Congratulations: you have obtained a bunch of really valuable information after you've called the /info endpoint. Time is 2019-07-20 17:52:09.839656327 +0000 UTC m=+20.003836519
+go-microservice-server_1  | The /info endpoint is being called...
+consul_1                  |     2019/07/20 17:52:14 [DEBUG] agent: Check "service:go-microservice-server" is passing
+go-microservice-server_1  | The /info endpoint is being called...
+go-microservice-client_1  | Congratulations: you have obtained a bunch of really valuable information after you've called the /info endpoint. Time is 2019-07-20 17:52:14.839707265 +0000 UTC m=+25.003887513
+go-microservice-server_1  | The /info endpoint is being called...
+consul_1                  |     2019/07/20 17:52:19 [DEBUG] agent: Check "service:go-microservice-server" is passing
+go-microservice-server_1  | The /info endpoint is being called...
+go-microservice-client_1  | Congratulations: you have obtained a bunch of really valuable information after you've called the /info endpoint. Time is 2019-07-20 17:52:19.83978128 +0000 UTC m=+30.003961452
+go-microservice-server_1  | The /info endpoint is being called...
+consul_1                  |     2019/07/20 17:52:24 [DEBUG] agent: Check "service:go-microservice-server" is passing
+go-microservice-server_1  | The /info endpoint is being called...
+go-microservice-client_1  | Congratulations: you have obtained a bunch of really valuable information after you've called the /info endpoint. Time is 2019-07-20 17:52:24.839706182 +0000 UTC m=+35.003886374
+go-microservice-server_1  | The /info endpoint is being called...
+consul_1                  |     2019/07/20 17:52:29 [DEBUG] agent: Check "service:go-microservice-server" is passing
+go-microservice-server_1  | The /info endpoint is being called...
+go-microservice-client_1  | Congratulations: you have obtained a bunch of really valuable information after you've called the /info endpoint. Time is 2019-07-20 17:52:29.839661362 +0000 UTC m=+40.003841441
+go-microservice-server_1  | The /info endpoint is being called...
+consul_1                  |     2019/07/20 17:52:34 [DEBUG] agent: Check "service:go-microservice-server" is passing
+go-microservice-server_1  | The /info endpoint is being called...
+go-microservice-client_1  | Congratulations: you have obtained a bunch of really valuable information after you've called the /info endpoint. Time is 2019-07-20 17:52:34.839644966 +0000 UTC m=+45.003825159
+```
+
+You can also look at the same information if you trace the go-microservice-client logs:
+
+```
+arturotarin@QOSMIO-X70B:~/go/src/github.com/ArturoTarinVillaescusa/go_cloud_orchestration/go_microservice_frameworks/microservice_discovery/with_go/client
+19:43:24 $ docker ps
+CONTAINER ID        IMAGE                          COMMAND                  CREATED             STATUS              PORTS                                                                                                                      NAMES
+eb126a18524d        go-microservice-client:1.0.0   "/bin/sh -c ${SOUR..."   20 seconds ago      Up 16 seconds                                                                                                                                  withgo_go-microservice-client_1
+9da7180f545a        go-microservice-server:1.0.0   "/bin/sh -c ${SOUR..."   24 seconds ago      Up 20 seconds                                                                                                                                  withgo_go-microservice-server_1
+b0aa3906d740        consul:latest                  "docker-entrypoint..."   29 seconds ago      Up 24 seconds       0.0.0.0:8300->8300/tcp, 0.0.0.0:8400->8400/tcp, 8301-8302/tcp, 8301-8302/udp, 0.0.0.0:8500->8500/tcp, 8600/tcp, 8600/udp   withgo_consul_1
+
+arturotarin@QOSMIO-X70B:~/go/src/github.com/ArturoTarinVillaescusa/go_cloud_orchestration/go_microservice_frameworks/microservice_discovery/with_go/client
+19:52:26 $ docker logs eb126a18524d
+Starting Go microservice client.
+Congratulations: you have obtained a bunch of really valuable information after you've called the /info endpoint. Time is 2019-07-20 17:51:54.839648149 +0000 UTC m=+5.003828300
+Congratulations: you have obtained a bunch of really valuable information after you've called the /info endpoint. Time is 2019-07-20 17:51:59.839703835 +0000 UTC m=+10.003884007
+Congratulations: you have obtained a bunch of really valuable information after you've called the /info endpoint. Time is 2019-07-20 17:52:04.839611529 +0000 UTC m=+15.003791742
+Congratulations: you have obtained a bunch of really valuable information after you've called the /info endpoint. Time is 2019-07-20 17:52:09.839656327 +0000 UTC m=+20.003836519
+Congratulations: you have obtained a bunch of really valuable information after you've called the /info endpoint. Time is 2019-07-20 17:52:14.839707265 +0000 UTC m=+25.003887513
+Congratulations: you have obtained a bunch of really valuable information after you've called the /info endpoint. Time is 2019-07-20 17:52:19.83978128 +0000 UTC m=+30.003961452
+Congratulations: you have obtained a bunch of really valuable information after you've called the /info endpoint. Time is 2019-07-20 17:52:24.839706182 +0000 UTC m=+35.003886374
+Congratulations: you have obtained a bunch of really valuable information after you've called the /info endpoint. Time is 2019-07-20 17:52:29.839661362 +0000 UTC m=+40.003841441
+```
+
 

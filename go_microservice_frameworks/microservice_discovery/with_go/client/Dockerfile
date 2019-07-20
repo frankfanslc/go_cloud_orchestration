@@ -6,7 +6,7 @@ RUN apk update && apk upgrade && apk add --no-cache bash git && \
 
 # Copy my sources on the Docker image
 ENV SOURCES /go/src/github.com/ArturoTarinVillaescusa/go_cloud_orchestration/go_microservice_frameworks/microservice_discovery/with_go/client/
-COPY .. ${SOURCES}
+COPY . ${SOURCES}
 
 RUN cd ${SOURCES}client/ && CGO_ENABLED=0 go build -o go-microservice-client
 
