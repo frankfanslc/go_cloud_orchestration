@@ -1,0 +1,20 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: go-microservice-k8s-client
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        io.kompose.service: go-microservice-k8s-client
+    spec:
+      containers:
+      - name: go-microservice-k8s-client
+        image: "go-microservice-k8s-client:1.0.0"
+        env:
+        - name: SERVICE_URL
+          valueFrom:
+            configMapKeyRef:
+              name: go-microservice-k8s-config
+              key: service.url

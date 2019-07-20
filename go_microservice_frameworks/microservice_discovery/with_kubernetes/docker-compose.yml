@@ -1,0 +1,22 @@
+version: '2'
+
+services:
+  go-microservice-k8s-server:
+    build:
+      context: .
+      dockerfile: server/Dockerfile
+    image: go-microservice-k8s-server:1.0.0
+    environment: 
+    - PORT=9090
+    ports: 
+    - "9090:9090"
+
+  go-microservice-k8s-client:
+    build:
+      context: .
+      dockerfile: client/Dockerfile
+    image: go-microservice-k8s-client:1.0.0
+    depends_on:
+    - go-microservice-k8s-server
+    environment: 
+    - SERVICE_URL=http://go-microservice-k8s-server:9090/info

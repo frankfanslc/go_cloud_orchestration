@@ -393,7 +393,7 @@ Step 8/8 : EXPOSE 8080
  ---> d47bd5746538
 Removing intermediate container 3681d2ecf269
 Successfully built d47bd5746538
-Successfully tagged go-microservice:1.0.1
+Successfully tagged go-microservice:1.0.0
 
 arturotarin@QOSMIO-X70B:~/go/src/github.com/ArturoTarinVillaescusa/go_cloud_orchestration/go_microservice_frameworks/microservice_implementation
 12:16:17 $ docker images
@@ -474,7 +474,7 @@ go-microservice     1.0.1               d47bd5746538        23 minutes ago      
 golang              1.12-alpine         6b21b4c6e7a3        7 days ago          350MB
 
 arturotarin@QOSMIO-X70B:~/go/src/github.com/ArturoTarinVillaescusa/go_cloud_orchestration/go_microservice_frameworks/microservice_implementation
-12:35:58 $ docker tag go-microservice:1.0.1 arturot/go-microservice:1.0.1
+12:35:58 $ docker tag go-microservice:1.0.0 arturot/go-microservice:1.0.0
 
 arturotarin@QOSMIO-X70B:~/go/src/github.com/ArturoTarinVillaescusa/go_cloud_orchestration/go_microservice_frameworks/microservice_implementation
 12:36:35 $ docker images

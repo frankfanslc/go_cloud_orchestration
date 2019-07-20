@@ -7,6 +7,7 @@
 4. [Lookup services using the Consul UI and REST API](#4-lookup-services-using-the-consul-ui-and-rest-api)
 5. [Go microservices registration with Consul](#5-go-microservices-registration-with-consul)
 6. [Go microservices lookup with Consul](#6-go-microservices-lookup-with-consul)
+7. [Go microservices discovery just with Kubernetes](#7-go-microservices-discovery-just-with-kubernetes)
 
 ## 1 Document objective
 
@@ -1069,4 +1070,314 @@ go-microservice-server_1  | The /info endpoint is being called...
 consul_1                  |     2019/07/20 17:59:50 [DEBUG] agent: Check "service:go-microservice-server" is passing
 go-microservice-server_1  | The /info endpoint is being called...
 go-microservice-client_1  | Congratulations: you have obtained a bunch of really valuable information after you've called the /info endpoint. Time is 2019-07-20 17:59:51.147096826 +0000 UTC m=+95.002951202
+```
+
+## 7 Go microservices discovery just with Kubernetes
+
+In this section we will:
+
+* Deploy a Kubernetes service, and config map definitions 
+* Implement the configuration of a client microservice application using the config map, with Go
+* Run the Go microservice client and server with Kubernetes
+
+So here no Consul configuration will be involved, we will use just Kubernetes.
+
+First, we need to start Minikube and check our ip:
+
+```
+arturotarin@QOSMIO-X70B:~/go/src/github.com/ArturoTarinVillaescusa/go_cloud_orchestration/go_microservice_frameworks/microservice_implementation
+13:04:57 $ minikube start
+Starting local Kubernetes v1.10.0 cluster...
+Starting VM...
+Getting VM IP address...
+Moving files into cluster...
+Setting up certs...
+Connecting to cluster...
+Setting up kubeconfig...
+Starting cluster components...
+Kubectl is now configured to use the cluster.
+Loading cached images from config file.
+
+arturotarin@QOSMIO-X70B:~/go/src/github.com/ArturoTarinVillaescusa/go_cloud_orchestration/go_microservice_frameworks/microservice_implementation
+13:06:28 $ minikube ip
+192.168.99.100
+
+arturotarin@QOSMIO-X70B:~/go/src/github.com/ArturoTarinVillaescusa/go_cloud_orchestration/go_microservice_frameworks/microservice_implementation
+13:06:48 $ kubectl cluster-info
+Kubernetes master is running at https://192.168.99.100:8443
+KubeDNS is running at https://192.168.99.100:8443/api/v1/namespaces/kube-system/services/kube-dns:dns/proxy
+
+To further debug and diagnose cluster problems, use 'kubectl cluster-info dump'.
+```
+
+See the Minikube Docker environment:
+
+```
+arturotarin@QOSMIO-X70B:~/go/src/github.com/ArturoTarinVillaescusa/go_cloud_orchestration/go_microservice_frameworks/microservice_implementation
+13:08:40 $ minikube docker-env
+export DOCKER_TLS_VERIFY="1"
+export DOCKER_HOST="tcp://192.168.99.100:2376"
+export DOCKER_CERT_PATH="/home/arturotarin/.minikube/certs"
+export DOCKER_API_VERSION="1.35"
+# Run this command to configure your shell:
+# eval $(minikube docker-env)
+```
+
+Load Minikube Docker environment credentials:
+
+```
+arturotarin@QOSMIO-X70B:~/go/src/github.com/ArturoTarinVillaescusa/go_cloud_orchestration/go_microservice_frameworks/microservice_implementation
+13:08:28 $ eval $(minikube docker-env)
+```
+
+Once we have done this, we can build the Docker images for the go-microservice-k8s-server and go-microservice-k8s-client applicatiions in the Minikube Docker environment:
+```
+arturotarin@QOSMIO-X70B:~/go/src/github.com/ArturoTarinVillaescusa/go_cloud_orchestration/go_microservice_frameworks/microservice_discovery/with_kubernetes
+20:55:24 $ docker-compose build 
+Building go-microservice-k8s-server
+Step 1/8 : FROM golang:1.12-alpine
+ ---> 6b21b4c6e7a3
+Step 2/8 : RUN apk update && apk upgrade && apk add --no-cache bash git &&     go get -u github.com/hashicorp/consul/api
+ ---> Running in b7961f2d690c
+fetch http://dl-cdn.alpinelinux.org/alpine/v3.10/main/x86_64/APKINDEX.tar.gz
+fetch http://dl-cdn.alpinelinux.org/alpine/v3.10/community/x86_64/APKINDEX.tar.gz
+v3.10.1-11-g89d0862481 [http://dl-cdn.alpinelinux.org/alpine/v3.10/main]
+v3.10.1-12-ga885fe876c [http://dl-cdn.alpinelinux.org/alpine/v3.10/community]
+OK: 10327 distinct packages available
+OK: 6 MiB in 15 packages
+fetch http://dl-cdn.alpinelinux.org/alpine/v3.10/main/x86_64/APKINDEX.tar.gz
+fetch http://dl-cdn.alpinelinux.org/alpine/v3.10/community/x86_64/APKINDEX.tar.gz
+(1/10) Installing ncurses-terminfo-base (6.1_p20190518-r0)
+(2/10) Installing ncurses-terminfo (6.1_p20190518-r0)
+(3/10) Installing ncurses-libs (6.1_p20190518-r0)
+(4/10) Installing readline (8.0.0-r0)
+(5/10) Installing bash (5.0.0-r0)
+Executing bash-5.0.0-r0.post-install
+(6/10) Installing nghttp2-libs (1.38.0-r0)
+(7/10) Installing libcurl (7.65.1-r0)
+(8/10) Installing expat (2.2.7-r0)
+(9/10) Installing pcre2 (10.33-r0)
+(10/10) Installing git (2.22.0-r0)
+Executing busybox-1.30.1-r2.trigger
+OK: 30 MiB in 25 packages
+Removing intermediate container b7961f2d690c
+ ---> 07f629f1664c
+Step 3/8 : ENV SOURCES /go/src/github.com/ArturoTarinVillaescusa/go_cloud_orchestration/go_microservice_frameworks/microservice_discovery/with_go/server/
+ ---> Running in f67902716099
+Removing intermediate container f67902716099
+ ---> a86b2d6a6451
+Step 4/8 : COPY . ${SOURCES}
+ ---> 197f77f42ca7
+Step 5/8 : RUN cd ${SOURCES}server/ && CGO_ENABLED=0 go build -o go-microservice-server
+ ---> Running in c7dcf121c0c3
+Removing intermediate container c7dcf121c0c3
+ ---> 2bfd85a87716
+Step 6/8 : ENV CONSUL_HTTP_ADDR localhost:8500
+ ---> Running in 16a945e448b4
+Removing intermediate container 16a945e448b4
+ ---> 2dc945a2ee5c
+Step 7/8 : WORKDIR ${SOURCES}server/
+Removing intermediate container deac3f2b199b
+ ---> d33ccb25064e
+Step 8/8 : CMD ${SOURCES}server/go-microservice-server
+ ---> Running in ef1b04c082e2
+Removing intermediate container ef1b04c082e2
+ ---> 4a24c202d685
+Successfully built 4a24c202d685
+Successfully tagged go-microservice-k8s-server:1.0.0
+Building go-microservice-k8s-client
+Step 1/8 : FROM golang:1.12-alpine
+ ---> 6b21b4c6e7a3
+Step 2/8 : RUN apk update && apk upgrade && apk add --no-cache bash git &&     go get -u github.com/hashicorp/consul/api
+ ---> Using cache
+ ---> 07f629f1664c
+Step 3/8 : ENV SOURCES /go/src/github.com/ArturoTarinVillaescusa/go_cloud_orchestration/go_microservice_frameworks/microservice_discovery/with_go/client/
+ ---> Running in bf10a15fede8
+Removing intermediate container bf10a15fede8
+ ---> c38af46c395a
+Step 4/8 : COPY . ${SOURCES}
+ ---> abc2bf9db624
+Step 5/8 : RUN cd ${SOURCES}client/ && CGO_ENABLED=0 go build -o go-microservice-client
+ ---> Running in f883a8c6ca85
+Removing intermediate container f883a8c6ca85
+ ---> c3b8e9e02549
+Step 6/8 : ENV CONSUL_HTTP_ADDR localhost:8500
+ ---> Running in 09f0d81971aa
+Removing intermediate container 09f0d81971aa
+ ---> 34a26c2b45a1
+Step 7/8 : WORKDIR ${SOURCES}client/
+Removing intermediate container 50ee8c46ac81
+ ---> 1479b3965977
+Step 8/8 : CMD ${SOURCES}client/go-microservice-client
+ ---> Running in 0fb6ba99fcd6
+Removing intermediate container 0fb6ba99fcd6
+ ---> 1990f0237f33
+Successfully built 1990f0237f33
+Successfully tagged go-microservice-k8s-client:1.0.0
+```
+
+The images are built:
+
+```
+arturotarin@QOSMIO-X70B:~/go/src/github.com/ArturoTarinVillaescusa/go_cloud_orchestration/go_microservice_frameworks/microservice_discovery/with_kubernetes
+20:58:23 $ docker images
+REPOSITORY                                      TAG                  IMAGE ID            CREATED             SIZE
+go-microservice-k8s-client                      1.0.0                1990f0237f33        2 minutes ago       558MB
+go-microservice-k8s-server                      1.0.0                4a24c202d685        2 minutes ago       573MB
+go-microservice                                 1.0.0                59a50ecec705        31 hours ago        477MB
+nginx                                           latest               98ebf73aba75        2 days ago          109MB
+golang                                          1.12-alpine          6b21b4c6e7a3        8 days ago          350MB
+consul                                          latest               7d52b83f718f        3 weeks ago         115MB
+tomcat                                          9.0                  449eebab16a3        8 months ago        662MB
+dummy-dicom-validator                           latest               496aa2ba71c0        9 months ago        333MB
+tomcat                                          8.0                  ef6a7c98d192        10 months ago       356MB
+perl                                            latest               c58a7ea6dfc4        10 months ago       885MB
+goldcar-alpakka-kafka-microservice              latest               810834e8a24b        11 months ago       344MB
+openjdk                                         10.0.1-10-jre-slim   6cf6acb97a09        12 months ago       288MB
+maven                                           3.5.3-jdk-10-slim    276091e24d4f        13 months ago       596MB
+k8s.gcr.io/kube-proxy-amd64                     v1.10.0              bfc21aadc7d3        16 months ago       97MB
+k8s.gcr.io/kube-controller-manager-amd64        v1.10.0              ad86dbed1555        16 months ago       148MB
+k8s.gcr.io/kube-scheduler-amd64                 v1.10.0              704ba848e69a        16 months ago       50.4MB
+k8s.gcr.io/kube-apiserver-amd64                 v1.10.0              af20925d51a3        16 months ago       225MB
+k8s.gcr.io/etcd-amd64                           3.1.12               52920ad46f5b        16 months ago       193MB
+k8s.gcr.io/kube-addon-manager                   v8.6                 9c16409588eb        17 months ago       78.4MB
+prom/prometheus                                 v2.1.0               c8ecf7c719c1        18 months ago       112MB
+k8s.gcr.io/k8s-dns-dnsmasq-nanny-amd64          1.14.8               c2ce1ffb51ed        18 months ago       41MB
+k8s.gcr.io/k8s-dns-sidecar-amd64                1.14.8               6f7f2dc7fab5        18 months ago       42.2MB
+k8s.gcr.io/k8s-dns-kube-dns-amd64               1.14.8               80cc5ea4b547        18 months ago       50.5MB
+k8s.gcr.io/pause-amd64                          3.1                  da86e6ba6ca1        19 months ago       742kB
+gcr.io/google_containers/metrics-server-amd64   v0.2.1               9801395070f3        19 months ago       42.5MB
+k8s.gcr.io/kubernetes-dashboard-amd64           v1.8.1               e94d2f21bc0c        19 months ago       121MB
+quay.io/coreos/k8s-prometheus-adapter-amd64     v0.2.0               2c0f732478d1        20 months ago       51.9MB
+gcr.io/k8s-minikube/storage-provisioner         v1.8.1               4689081edb10        20 months ago       80.8MB
+gcr.io/google_containers/kubernetes-kafka       1.0-10.2.1           f9da8ff94c0d        2 years ago         388MB
+gcr.io/google_containers/kubernetes-zookeeper   1.0-3.4.10           5586da414c9c        2 years ago         273MB
+```
+
+Next, we can deploy the go-microservice-k8s-server application and service in Kubernetes:
+
+```
+arturotarin@QOSMIO-X70B:~/go/src/github.com/ArturoTarinVillaescusa/go_cloud_orchestration/go_microservice_frameworks/microservice_discovery/with_kubernetes
+21:03:43 $ kubectl apply -f go-microservice-k8s-server-deployment.yaml 
+deployment "go-microservice-k8s-server" created
+
+arturotarin@QOSMIO-X70B:~/go/src/github.com/ArturoTarinVillaescusa/go_cloud_orchestration/go_microservice_frameworks/microservice_discovery/with_kubernetes
+21:03:51 $ kubectl apply -f go-microservice-k8s-server-service.yaml 
+service "go-microservice-k8s-server" created
+```
+
+Have a look at the list of the pod, our server must be there:
+
+```
+arturotarin@QOSMIO-X70B:~/go/src/github.com/ArturoTarinVillaescusa/go_cloud_orchestration/go_microservice_frameworks/microservice_discovery/with_kubernetes
+21:04:34 $ kubectl get pods
+NAME                                                 READY     STATUS    RESTARTS   AGE
+go-microservice-k8s-server-6d4c6b5475-zrhtp          1/1       Running   0          50s
+goldcar-alpakka-kafka-microservice-dc8dbcb9f-bqz9d   1/1       Running   10         332d
+kafka-0                                              1/1       Running   17         298d
+microservice-in-go-54d84cb66d-4hpbc                  0/1       Pending   0          1d
+microservice-in-go-54d84cb66d-ksg68                  0/1       Pending   0          1d
+microservice-in-go-54d84cb66d-rchwj                  1/1       Running   1          1d
+philips-microservice-6568ccdbd5-ckrsq                1/1       Running   3          292d
+task-pv-pod                                          1/1       Running   5          293d
+tomcat-56ff5c79c5-lf8fl                              1/1       Running   2          91d
+zk-0                                                 1/1       Running   11         332d
+```
+
+Make sure that the service is also there:
+```
+arturotarin@QOSMIO-X70B:~/go/src/github.com/ArturoTarinVillaescusa/go_cloud_orchestration/go_microservice_frameworks/microservice_discovery/with_kubernetes
+21:04:41 $ kubectl get services
+NAME                                         TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)             AGE
+go-microservice-k8s-server                   NodePort    10.96.74.139    <none>        9090:32463/TCP      1m
+goldcar-alpakka-kafka-microservice-service   NodePort    10.99.105.212   <none>        8080:32000/TCP      332d
+kafka-hs                                     ClusterIP   None            <none>        9093/TCP            332d
+kubernetes                                   ClusterIP   10.96.0.1       <none>        443/TCP             332d
+microservice-in-go                           NodePort    10.103.95.38    <none>        9090:31489/TCP      1d
+philips-microservice-service                 NodePort    10.106.207.39   <none>        8083:31000/TCP      292d
+tomcat                                       NodePort    10.105.69.168   <none>        8080:31723/TCP      91d
+tomcat-service                               NodePort    10.103.30.100   <none>        8080:31234/TCP      91d
+zk-cs                                        ClusterIP   10.99.168.219   <none>        2181/TCP            332d
+zk-hs                                        ClusterIP   None            <none>        2888/TCP,3888/TCP   332d
+```
+
+So we have our go-microservice-k8s-server running and it is accessible via the DNS name.
+
+Next, specify the config map, where we will define the  service.url as "http://go-microservice-k8s-server:9090/info".
+
+```
+arturotarin@QOSMIO-X70B:~/go/src/github.com/ArturoTarinVillaescusa/go_cloud_orchestration/go_microservice_frameworks/microservice_discovery/with_kubernetes
+21:05:42 $ kubectl apply -f go-microservice-k8s-configmap.yaml 
+configmap "go-microservice-k8s-config" created
+
+arturotarin@QOSMIO-X70B:~/go/src/github.com/ArturoTarinVillaescusa/go_cloud_orchestration/go_microservice_frameworks/microservice_discovery/with_kubernetes
+21:20:17 $ kubectl get configmap
+NAME                         DATA      AGE
+go-microservice-k8s-config   1         30s
+
+arturotarin@QOSMIO-X70B:~/go/src/github.com/ArturoTarinVillaescusa/go_cloud_orchestration/go_microservice_frameworks/microservice_discovery/with_kubernetes
+21:20:21 $ kubectl describe configmap go-microservice-k8s-config
+Name:         go-microservice-k8s-config
+Namespace:    default
+Labels:       <none>
+Annotations:  kubectl.kubernetes.io/last-applied-configuration={"apiVersion":"v1","data":{"service.url":"http://go-microservice-k8s-server:9090/info"},"kind":"ConfigMap","metadata":{"annotations":{},"name":"go-micr...
+
+Data
+====
+service.url:
+----
+http://go-microservice-k8s-server:9090/info
+Events:  <none>
+```
+
+This variable will be reacheable later on by the go-microservice-k8s-client appilcation via the
+SERVICE_URL environment variable.
+
+Next, deploy the go-microservice-k8s-client application:
+
+```
+arturotarin@QOSMIO-X70B:~/go/src/github.com/ArturoTarinVillaescusa/go_cloud_orchestration/go_microservice_frameworks/microservice_discovery/with_kubernetes
+21:20:45 $ kubectl apply -f go-microservice-k8s-client-deployment.yaml 
+deployment "go-microservice-k8s-client" created
+```
+
+As we can see with this command, the client is using the SERVICE_URL environment variable:
+
+```
+arturotarin@QOSMIO-X70B:~/go/src/github.com/ArturoTarinVillaescusa/go_cloud_orchestration/go_microservice_frameworks/microservice_discovery/with_kubernetes
+21:23:35 $ kubectl describe deployment go-microservice-k8s-client
+Name:                   go-microservice-k8s-client
+Namespace:              default
+CreationTimestamp:      Sat, 20 Jul 2019 21:22:40 +0200
+Labels:                 io.kompose.service=go-microservice-k8s-client
+Annotations:            deployment.kubernetes.io/revision=1
+                        kubectl.kubernetes.io/last-applied-configuration={"apiVersion":"extensions/v1beta1","kind":"Deployment","metadata":{"annotations":{},"name":"go-microservice-k8s-client","namespace":"default"},"spec":{...
+Selector:               io.kompose.service=go-microservice-k8s-client
+Replicas:               1 desired | 1 updated | 1 total | 0 available | 1 unavailable
+StrategyType:           RollingUpdate
+MinReadySeconds:        0
+RollingUpdateStrategy:  1 max unavailable, 1 max surge
+Pod Template:
+  Labels:  io.kompose.service=go-microservice-k8s-client
+  Containers:
+   go-microservice-k8s-client:
+    Image:  go-microservice-k8s-client:1.0.0
+    Port:   <none>
+    Environment:
+      SERVICE_URL:  <set to the key 'service.url' of config map 'go-microservice-k8s-config'>  Optional: false
+    Mounts:         <none>
+  Volumes:          <none>
+Conditions:
+  Type           Status  Reason
+  ----           ------  ------
+  Available      True    MinimumReplicasAvailable
+  Progressing    True    ReplicaSetUpdated
+OldReplicaSets:  <none>
+NewReplicaSet:   go-microservice-k8s-client-57f9974b9 (1/1 replicas created)
+Events:
+  Type    Reason             Age   From                   Message
+  ----    ------             ----  ----                   -------
+  Normal  ScalingReplicaSet  1m    deployment-controller  Scaled up replica set go-microservice-k8s-client-57f9974b9 to 1
+```
+
 

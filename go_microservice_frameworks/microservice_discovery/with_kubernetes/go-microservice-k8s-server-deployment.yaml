@@ -1,0 +1,32 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: go-microservice-k8s-server
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        io.kompose.service: go-microservice-k8s-server
+    spec:
+      containers:
+      - name: go-microservice-k8s-server
+        image: "go-microservice-k8s-server:1.0.0"
+        ports:
+        - containerPort: 9090
+        env:
+        - name: PORT
+          value: "9090"
+
+        readinessProbe:
+          httpGet:
+            path: /info
+            port: 9090
+          initialDelaySeconds: 5
+          timeoutSeconds: 5
+        livenessProbe:
+          httpGet:
+            path: /info
+            port: 9090
+          initialDelaySeconds: 10
+          timeoutSeconds: 5

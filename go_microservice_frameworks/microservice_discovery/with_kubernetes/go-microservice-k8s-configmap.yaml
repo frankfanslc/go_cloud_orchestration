@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: go-microservice-k8s-config
+  namespace: default
+data:
+  service.url: "http://go-microservice-k8s-server:9090/info"
