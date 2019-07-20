@@ -5,6 +5,8 @@
 2. [Run Consul](#2-run-consul)
 3. [Register services with Consul using REST API](#3-register-services-with-consul-using-rest-api)
 4. [Lookup services using the Consul UI and REST API](#4-lookup-services-using-the-consul-ui-and-rest-api)
+5. [Go microservices registration with Consul](#5-go-microservices-registration-with-consul)
+6. [Go microservices lookup with Consul](#5-go-microservices-lookup-with-consul)
 
 ## 1 Document objective
 
@@ -19,7 +21,7 @@ In this block we are going to:
 Deploy Consul and two 'microservice-in-go' microservices in Docker:
 
 ```
-arturotarin@QOSMIO-X70B:~/go/src/github.com/ArturoTarinVillaescusa/go_cloud_orchestration/go_microservice_frameworks/microservice_discovery
+arturotarin@QOSMIO-X70B:~/go/src/github.com/ArturoTarinVillaescusa/go_cloud_orchestration/go_microservice_frameworks/microservice_discovery/just_consul
 15:10:31 $ docker-compose up -d
 Pulling consul (consul:latest)...
 latest: Pulling from library/consul
@@ -54,7 +56,7 @@ Consul's services catalog starts empty:
 Register Consul agent 'microservice-in-go-01':
 
 ```
-arturotarin@QOSMIO-X70B:~/go/src/github.com/ArturoTarinVillaescusa/go_cloud_orchestration/go_microservice_frameworks/microservice_discovery
+arturotarin@QOSMIO-X70B:~/go/src/github.com/ArturoTarinVillaescusa/go_cloud_orchestration/go_microservice_frameworks/microservice_discovery/just_consul
 18:36:41 $ cat register_consul_agent_microservice-in-go-01.json 
 {
   "ID": "microservice-in-go-01",
@@ -75,7 +77,7 @@ arturotarin@QOSMIO-X70B:~/go/src/github.com/ArturoTarinVillaescusa/go_cloud_orch
   }
 }
 
-arturotarin@QOSMIO-X70B:~/go/src/github.com/ArturoTarinVillaescusa/go_cloud_orchestration/go_microservice_frameworks/microservice_discovery
+arturotarin@QOSMIO-X70B:~/go/src/github.com/ArturoTarinVillaescusa/go_cloud_orchestration/go_microservice_frameworks/microservice_discovery/just_consul
 18:36:47 $ cat register_consul_agent_microservice-in-go-02.json 
 {
   "ID": "microservice-in-go-02",
@@ -96,10 +98,10 @@ arturotarin@QOSMIO-X70B:~/go/src/github.com/ArturoTarinVillaescusa/go_cloud_orch
   }
 }
 
-arturotarin@QOSMIO-X70B:~/go/src/github.com/ArturoTarinVillaescusa/go_cloud_orchestration/go_microservice_frameworks/microservice_discovery
+arturotarin@QOSMIO-X70B:~/go/src/github.com/ArturoTarinVillaescusa/go_cloud_orchestration/go_microservice_frameworks/microservice_discovery/just_consul
 18:38:37 $ curl -d "@register_consul_agent_microservice-in-go-01.json" -H "Content-Type: application/json" -X PUT http://localhost:8500/v1/agent/service/register
 
-arturotarin@QOSMIO-X70B:~/go/src/github.com/ArturoTarinVillaescusa/go_cloud_orchestration/go_microservice_frameworks/microservice_discovery
+arturotarin@QOSMIO-X70B:~/go/src/github.com/ArturoTarinVillaescusa/go_cloud_orchestration/go_microservice_frameworks/microservice_discovery/just_consul
 19:01:20 $ curl -d "@register_consul_agent_microservice-in-go-02.json" -H "Content-Type: application/json" -X PUT http://localhost:8500/v1/agent/service/register
 
 
@@ -112,7 +114,7 @@ Look at the registered services:
 ![alt text](images/image02.png "Service is registered")
 
 ```
-arturotarin@QOSMIO-X70B:~/go/src/github.com/ArturoTarinVillaescusa/go_cloud_orchestration/go_microservice_frameworks/microservice_discovery
+arturotarin@QOSMIO-X70B:~/go/src/github.com/ArturoTarinVillaescusa/go_cloud_orchestration/go_microservice_frameworks/microservice_discovery/just_consul
 18:39:10 $ curl http://localhost:8500/v1/catalog/services
 {
     "consul": [],
@@ -122,7 +124,7 @@ arturotarin@QOSMIO-X70B:~/go/src/github.com/ArturoTarinVillaescusa/go_cloud_orch
     ]
 }
 (base) 
-arturotarin@QOSMIO-X70B:~/go/src/github.com/ArturoTarinVillaescusa/go_cloud_orchestration/go_microservice_frameworks/microservice_discovery
+arturotarin@QOSMIO-X70B:~/go/src/github.com/ArturoTarinVillaescusa/go_cloud_orchestration/go_microservice_frameworks/microservice_discovery/just_consul
 18:39:25 $ curl http://localhost:8500/v1/agent/services
 {
     "microservice-in-go-01": {
@@ -163,7 +165,7 @@ arturotarin@QOSMIO-X70B:~/go/src/github.com/ArturoTarinVillaescusa/go_cloud_orch
 Get all the healthchecks information:
 
 ```
-arturotarin@QOSMIO-X70B:~/go/src/github.com/ArturoTarinVillaescusa/go_cloud_orchestration/go_microservice_frameworks/microservice_discovery
+arturotarin@QOSMIO-X70B:~/go/src/github.com/ArturoTarinVillaescusa/go_cloud_orchestration/go_microservice_frameworks/microservice_discovery/just_consul
 19:09:34 $ curl http://localhost:8500/v1/health/service/microservice-in-go
 [
     {
@@ -314,7 +316,7 @@ arturotarin@QOSMIO-X70B:~/go/src/github.com/ArturoTarinVillaescusa/go_cloud_orch
 Get the passing api information:
 
 ```
-arturotarin@QOSMIO-X70B:~/go/src/github.com/ArturoTarinVillaescusa/go_cloud_orchestration/go_microservice_frameworks/microservice_discovery
+arturotarin@QOSMIO-X70B:~/go/src/github.com/ArturoTarinVillaescusa/go_cloud_orchestration/go_microservice_frameworks/microservice_discovery/just_consul
 19:11:26 $ curl http://localhost:8500/v1/health/service/microservice-in-go?passing
 [
     {
@@ -465,8 +467,17 @@ arturotarin@QOSMIO-X70B:~/go/src/github.com/ArturoTarinVillaescusa/go_cloud_orch
 Get the critical api information:
 
 ```
-arturotarin@QOSMIO-X70B:~/go/src/github.com/ArturoTarinVillaescusa/go_cloud_orchestration/go_microservice_frameworks/microservice_discovery
+arturotarin@QOSMIO-X70B:~/go/src/github.com/ArturoTarinVillaescusa/go_cloud_orchestration/go_microservice_frameworks/microservice_discovery/just_consul
 19:13:06 $ curl http://localhost:8500/v1/health/state/critical
 []
 
 ```
+## 5 Go microservices registration with Consul
+
+In this section we will:
+
+* Implement with Go a service endpoint registration to Consul for our Go microservice
+* Implement and register health check endpoint
+* Run Consul and our Go microservice and see that our development works as expected
+
+## 6 Go microservices lookup with Consul
