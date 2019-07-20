@@ -6,7 +6,7 @@
 3. [Register services with Consul using REST API](#3-register-services-with-consul-using-rest-api)
 4. [Lookup services using the Consul UI and REST API](#4-lookup-services-using-the-consul-ui-and-rest-api)
 5. [Go microservices registration with Consul](#5-go-microservices-registration-with-consul)
-6. [Go microservices lookup with Consul](#5-go-microservices-lookup-with-consul)
+6. [Go microservices lookup with Consul](#6-go-microservices-lookup-with-consul)
 
 ## 1 Document objective
 
