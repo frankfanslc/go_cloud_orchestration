@@ -1380,4 +1380,35 @@ Events:
   Normal  ScalingReplicaSet  1m    deployment-controller  Scaled up replica set go-microservice-k8s-client-57f9974b9 to 1
 ```
 
+The Kubernetes UI also allows to see the deployments:
 
+```
+arturotarin@QOSMIO-X70B:~/go/src/github.com/ArturoTarinVillaescusa/go_cloud_orchestration/go_microservice_frameworks/microservice_discovery/with_kubernetes
+22:01:16 $ minikube dashboard
+Opening kubernetes dashboard in default browser...
+```
+
+![alt text](images/image04.png "Client and server deployment seen in Kubernetes")
+
+We can see the client logs:
+
+```
+arturotarin@QOSMIO-X70B:~/go/src/github.com/ArturoTarinVillaescusa/go_cloud_orchestration/go_microservice_frameworks/microservice_discovery/with_kubernetes
+22:01:24 $ kubectl get pods
+NAME                                                 READY     STATUS    RESTARTS   AGE
+go-microservice-k8s-client-57f9974b9-vr2np           1/1       Running   0          4m
+go-microservice-k8s-server-6d4c6b5475-6tkr7          1/1       Running   0          4m
+goldcar-alpakka-kafka-microservice-dc8dbcb9f-bqz9d   1/1       Running   10         332d
+kafka-0                                              1/1       Running   17         298d
+philips-microservice-6568ccdbd5-ckrsq                1/1       Running   3          292d
+task-pv-pod                                          1/1       Running   5          293d
+tomcat-56ff5c79c5-lf8fl                              1/1       Running   2          91d
+zk-0                                                 1/1       Running   11         332d
+
+arturotarin@QOSMIO-X70B:~/go/src/github.com/ArturoTarinVillaescusa/go_cloud_orchestration/go_microservice_frameworks/microservice_discovery/with_kubernetes
+22:02:30 $ kubectl logs go-microservice-k8s-client-57f9974b9-vr2np
+SERVICE_URL was initialized to http://go-microservice-k8s-server:9090/info
+Time is 2019-07-20 17:59:46.14717465 +0000 UTC m=+90.003029107
+Time is 2019-07-20 17:59:51.147096826 +0000 UTC m=+95.002951202
+...
+```

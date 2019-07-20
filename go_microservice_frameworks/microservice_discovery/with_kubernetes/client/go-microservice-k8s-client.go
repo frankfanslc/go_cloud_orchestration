@@ -26,6 +26,7 @@ func initServiceUrl() {
 	if len(url) == 0 {
 		url = "http://go-microservice-k8s-server:9090/info"
 	}
+	fmt.Printf("SERVICE_URL was initialized to %s\n", url)
 }
 
 
@@ -47,5 +48,5 @@ func greeting(t time.Time, client *http.Client) {
 
 	// Print the endpoint response
 	body, _ := ioutil.ReadAll(response.Body)
-	fmt.Sprintf("%s. at the time %v\n", body, t)
+	fmt.Printf("%s. at the time %v\n", body, t)
 }
