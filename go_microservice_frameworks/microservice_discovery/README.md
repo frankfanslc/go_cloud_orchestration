@@ -685,3 +685,6 @@ arturotarin@QOSMIO-X70B:~/go/src/github.com/ArturoTarinVillaescusa/go_cloud_orch
 }
 ```
 
+But the good thing is that a Go microservice client like the provided in our example can find the 
+Go microservice server example using the Consul APIs as well. Let's see how:
+
