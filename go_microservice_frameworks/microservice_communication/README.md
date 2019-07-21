@@ -2,7 +2,7 @@
 
 #### Table Of Contents
 1. [Document objective](#1-document-objective)
-2. [Communication patterns: sync, async](#2-communication-patterns:-sync,-async)
+2. [Sync and Async communication patterns](#2-sync-and-async-communication-patterns)
 
 ## 1 Document objective
 
@@ -13,5 +13,5 @@ In this block we are going to:
 * Implement async message queuing with RabbitMQ
 * Implement publish-subscribe Kafka clients
 
-## 2 Communication patterns: sync, async
+## 2 Sync and Async communication patterns
 
