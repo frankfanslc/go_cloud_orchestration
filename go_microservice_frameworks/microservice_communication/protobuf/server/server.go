@@ -32,7 +32,7 @@ func main() {
 	// Create a new service. Optionally include some options here.
 	service := micro.NewService(
 		micro.Name("greeter"),
-		micro.Version("1.0.1"),
+		micro.Version("1.0.0"),
 		micro.Metadata(map[string]string{
 			"type": "helloworld",
 		}),
