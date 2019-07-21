@@ -9,4 +9,5 @@ require (
 	github.com/hashicorp/consul/api v1.1.0
 	github.com/micro/go-micro v1.7.0
 	github.com/nats-io/nats-server/v2 v2.0.2 // indirect
+	golang.org/x/net v0.0.0-20190620200207-3b0461eec859
 )

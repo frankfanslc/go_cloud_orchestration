@@ -2,38 +2,49 @@ package main
 
 import (
 	"fmt"
-	"github.com/ArturoTarinVillaescusa/go_cloud_orchestration/go_microservice_frameworks/microservice_communication/protobuf/proto_definition"
-	micro "github.com/micro/go-micro"
+	"time"
+
+	proto "github.com/ArturoTarinVillaescusa/go_cloud_orchestration/go_microservice_frameworks/microservice_communication/protobuf/proto_definition"
+	"github.com/micro/go-micro"
 	"golang.org/x/net/context"
 )
 
-// The Greeting api
-type Greeting struct {
+// The Greeter API.
+type Greeter struct{}
 
-}
+var counter int
 
-// This is a Greeting api method
-func (g * Greeting) Hello(ctx context.Context, req *proto_definition.HelloRequest, rsp *proto_definition.HelloResponse) error {
+// Hello is a Greeter API method.
+func (g *Greeter) Hello(ctx context.Context, req *proto.HelloRequest, rsp *proto.HelloResponse) error {
+	counter++
+	if counter > 7 && counter < 15 {
+		time.Sleep(1000 * time.Millisecond)
+	} else {
+		time.Sleep(100 * time.Millisecond)
+	}
 
-	rsp.Greeting = req.Name
-	fmt.Printf("Responding with the '%s' ProtoBuf service\n", rsp.Greeting)
+	rsp.Greeting = "Hello " + req.Name
+	fmt.Printf("Responding with %s\n", rsp.Greeting)
 	return nil
 }
-func main()  {
-	// Create a new service with default flags
+
+func main() {
+	// Create a new service. Optionally include some options here.
 	service := micro.NewService(
-		micro.Name("greeting"),
-		micro.Version("1.0.0"),
+		micro.Name("greeter"),
+		micro.Version("1.0.1"),
 		micro.Metadata(map[string]string{
-			"type": "hello",
+			"type": "helloworld",
 		}),
 	)
 
-	// Init parses the command line flags, which will override the default flags
-	// written in the NewService initialization
+	// Init will parse the command line flags. Any flags set will
+	// override the above settings. Options defined here will
+	// override anything set on the command line.
 	service.Init()
 
 	// Register handler
+	proto.RegisterGreeterHandler(service.Server(), new(Greeter))
 
 	// Run the server
 	if err := service.Run(); err != nil {
