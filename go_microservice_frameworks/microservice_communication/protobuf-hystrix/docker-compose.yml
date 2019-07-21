@@ -8,7 +8,7 @@ services:
       - "8400:8400"
       - "8500:8500"
     networks:
-      - sky-net
+      - my-net
 
   protobuf-hystrix-server:
     build:
@@ -20,7 +20,7 @@ services:
     depends_on:
       - consul
     networks:
-      - sky-net
+      - my-net
 
   protobuf-hystrix-client:
     build:
@@ -33,16 +33,16 @@ services:
       - consul
       - protobuf-hystrix-server
     networks:
-      - sky-net
+      - my-net
 
   hystrix-dashboard:
     image: mlabouardy/hystrix-dashboard:latest
     ports:
       - "9002:9002"
     networks:
-      - sky-net
+      - my-net
 
 networks:
-  sky-net:
+  my-net:
     driver: bridge
   
