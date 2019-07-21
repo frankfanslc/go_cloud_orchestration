@@ -149,7 +149,11 @@ Stopping protobuf_protobuf-server_1   ... done
 
 ## 3 Add synchronous Hystrix circuit breaker and monitor to the RPC client and server
 
-Now Let's make things more interesting: let's implement synchronous call using the Hystrix circuit breaker and add a monitoring dashboard
+Now Let's make things more interesting: let's implement synchronous call using the Hystrix circuit breaker and add a monitoring dashboard.
+
+The Hystrix diagram states provided by Netflix is this:
+
+![alt text](https://raw.githubusercontent.com/wiki/Netflix/Hystrix/images/hystrix-command-flow-chart.png "Hystrix states diagram")
 
 Build all the images:
 
