@@ -5,7 +5,7 @@
 Package greeter is a generated protocol buffer package.
 
 It is generated from these files:
-	github.com/ArturoTarinVillaescusa/go_cloud_orchestration/go_microservice_frameworks/microservice_communication/protobuf-hystrix/proto/greeter.proto
+    github.com/ArturoTarinVillaescusa/go_cloud_orchestration/go_microservice_frameworks/microservice_communication/protobuf-hystrix/proto/greeter.proto
 
 It has these top-level messages:
 	HelloRequest
