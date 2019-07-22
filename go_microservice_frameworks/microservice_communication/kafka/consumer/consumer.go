@@ -2,79 +2,68 @@ package main
 
 import (
 	"fmt"
-	"github.com/confluentinc/confluent-kafka-go/kafka"
 	"os"
 	"os/signal"
-	"syscall"
+	"time"
+	"github.com/Shopify/sarama"
 )
 
 func main() {
+	fmt.Println("Starting synchronous Kafka subscriber...")
+	time.Sleep(5 * time.Second)
 
-	broker := []string{brokerAddr()}
-	group := "consumergroup01"
-	topics := []string{topic()}
-	sigchan := make(chan os.Signal, 1)
-	signal.Notify(sigchan, syscall.SIGINT, syscall.SIGTERM)
+	config := sarama.NewConfig()
+	config.Consumer.Offsets.Initial = sarama.OffsetOldest
+	config.Consumer.Offsets.CommitInterval = 5 * time.Second
+	config.Consumer.Return.Errors = true
 
-	c, err := kafka.NewConsumer(&kafka.ConfigMap{
-		"bootstrap.servers": broker,
-		// Avoid connecting to IPv6 brokers:
-		// This is needed for the ErrAllBrokersDown show-case below
-		// when using localhost brokers on OSX, since the OSX resolver
-		// will return the IPv6 addresses first.
-		// You typically don't need to specify this configuration property.
-		"broker.address.family": "v4",
-		"group.id":              group,
-		"session.timeout.ms":    6000,
-		"auto.offset.reset":     "earliest"})
-
+	// Create new consumer
+	brokers := []string{brokerAddr()}
+	master, err := sarama.NewConsumer(brokers, config)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Failed to create consumer: %s\n", err)
-		os.Exit(1)
+		panic(err)
 	}
 
-	fmt.Printf("Created Consumer %v\n", c)
+	defer func() {
+		if err := master.Close(); err != nil {
+			panic(err)
+		}
+	}()
 
-	err = c.SubscribeTopics(topics, nil)
+	topic := topic()
 
-	run := true
+	// decide about the offset here: literal value, sarama.OffsetOldest, sarama.OffsetNewest
+	// this is important in case of reconnection
+	consumer, err := master.ConsumePartition(topic, 0, sarama.OffsetOldest)
+	if err != nil {
+		panic(err)
+	}
 
-	for run == true {
-		select {
-		case sig := <-sigchan:
-			fmt.Printf("Caught signal %v: terminating\n", sig)
-			run = false
-		default:
-			ev := c.Poll(100)
-			if ev == nil {
-				continue
-			}
+	signals := make(chan os.Signal, 1)
+	signal.Notify(signals, os.Interrupt)
 
-			switch e := ev.(type) {
-			case *kafka.Message:
-				fmt.Printf("%% Message on %s:\n%s\n",
-					e.TopicPartition, string(e.Value))
-				if e.Headers != nil {
-					fmt.Printf("%% Headers: %v\n", e.Headers)
-				}
-			case kafka.Error:
-				// Errors should generally be considered
-				// informational, the client will try to
-				// automatically recover.
-				// But in this example we choose to terminate
-				// the application if all brokers are down.
-				fmt.Fprintf(os.Stderr, "%% Error: %v: %v\n", e.Code(), e)
-				if e.Code() == kafka.ErrAllBrokersDown {
-					run = false
-				}
-			default:
-				fmt.Printf("Ignored %v\n", e)
+	// Count how many message processed
+	msgCount := 0
+
+	// Get signal for finish
+	doneCh := make(chan struct{})
+	go func() {
+		for {
+			select {
+			case err := <-consumer.Errors():
+				fmt.Println(err)
+			case msg := <-consumer.Messages():
+				msgCount++
+				fmt.Println("Received messages", string(msg.Key), string(msg.Value))
+			case <-signals:
+				fmt.Println("Interrupt is detected")
+				doneCh <- struct{}{}
 			}
 		}
-	}
+	}()
 
-	fmt.Printf("Closing consumer\n")
-	c.Close()
+	<-doneCh
+	fmt.Println("Processed", msgCount, "messages")
 }
 
 func brokerAddr() string {

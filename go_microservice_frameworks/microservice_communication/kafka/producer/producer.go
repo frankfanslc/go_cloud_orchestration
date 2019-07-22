@@ -2,46 +2,59 @@ package main
 
 import (
 	"fmt"
-	"github.com/confluentinc/confluent-kafka-go/kafka"
 	"os"
+	"time"
+	"github.com/Shopify/sarama"
 )
 
 func main() {
+	fmt.Println("Starting synchronous Kafka producer...")
+	time.Sleep(5 * time.Second)
+
+	config := sarama.NewConfig()
+	config.Producer.Return.Successes = true
+	config.Producer.Return.Errors = true
+	config.Producer.RequiredAcks = sarama.WaitForAll
+	config.Producer.Retry.Max = 5
 
 	brokers := []string{brokerAddr()}
-	topic := topic()
-
-	p, err := kafka.NewProducer(&kafka.ConfigMap{"bootstrap.servers": brokers})
-
+	producer, err := sarama.NewSyncProducer(brokers, config)
 	if err != nil {
-		fmt.Printf("Failed to create producer: %s\n", err)
-		os.Exit(1)
+		panic(err)
 	}
 
-	fmt.Printf("Created Producer %v\n", p)
+	defer func() {
+		if err := producer.Close(); err != nil {
+			panic(err)
+		}
+	}()
 
-	// Optional delivery channel, if not specified the Producer object's
-	// .Events channel is used.
-	deliveryChan := make(chan kafka.Event)
+	topic := topic()
+	msgCount := 0
 
-	value := "Hello Go!"
-	err = p.Produce(&kafka.Message{
-		TopicPartition: kafka.TopicPartition{Topic: &topic, Partition: kafka.PartitionAny},
-		Value:          []byte(value),
-		Headers:        []kafka.Header{{Key: "myTestHeader", Value: []byte("header values are binary")}},
-	}, deliveryChan)
+	// Get signal for finish
+	doneCh := make(chan struct{})
 
-	e := <-deliveryChan
-	m := e.(*kafka.Message)
+	go func() {
+		for {
+			msgCount++
 
-	if m.TopicPartition.Error != nil {
-		fmt.Printf("Delivery failed: %v\n", m.TopicPartition.Error)
-	} else {
-		fmt.Printf("Delivered message to topic %s [%d] at offset %v\n",
-		*m.TopicPartition.Topic, m.TopicPartition.Partition, m.TopicPartition.Offset)
-	}
+			msg := &sarama.ProducerMessage{
+				Topic: topic,
+				Value: sarama.StringEncoder(fmt.Sprintf("Hello Kafka %v", msgCount)),
+			}
 
-	close(deliveryChan)
+			partition, offset, err := producer.SendMessage(msg)
+			if err != nil {
+				panic(err)
+			}
+
+			fmt.Printf("Message is stored in topic(%s)/partition(%d)/offset(%d)\n", topic, partition, offset)
+			time.Sleep(5 * time.Second)
+		}
+	}()
+
+	<-doneCh
 }
 
 func brokerAddr() string {

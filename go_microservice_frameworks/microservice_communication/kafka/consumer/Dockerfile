@@ -1,13 +1,9 @@
-FROM golang:1.12-alpine
+FROM golang:1.9
 
-# Install git and clone the Confluent Kafka Go api sources
-RUN apk update && apk upgrade && apk add --no-cache bash git &&
-    go get github.com/confluentinc/confluent-kafka-go/kafka
+RUN go get github.com/Shopify/sarama
 
 ENV SOURCES /go/src/github.com/ArturoTarinVillaescusa/go_cloud_orchestration/go_microservice_communication/kafka/
 COPY . ${SOURCES}
-
-
 
 RUN cd ${SOURCES}consumer/ && CGO_ENABLED=0 go build -o consumer
 

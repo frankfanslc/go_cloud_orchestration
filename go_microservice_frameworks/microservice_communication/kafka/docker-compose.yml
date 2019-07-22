@@ -40,7 +40,7 @@ services:
   kafka-consumer:
     build:
       context: .
-      dockerfile: subscriber/Dockerfile
+      dockerfile: consumer/Dockerfile
     image: kafka-consumer:1.0.0
     environment:
       - BROKER_ADDR=kafka:9092
