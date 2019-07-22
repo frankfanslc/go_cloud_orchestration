@@ -381,4 +381,208 @@ and after some seconds, Hystrix opens the circuit again
 
 ## 4 Implement async message queuing with RabbitMQ
 
+In this section we've implemented a message producer and a message consumer for RabbitMQ in Go
+
+Let's compile the images 
+
+```
+arturotarin@QOSMIO-X70B:~/go/src/github.com/ArturoTarinVillaescusa/go_cloud_orchestration/go_microservice_frameworks/microservice_communication/rabbitmq
+07:11:56 $ docker-compose build 
+rabbitmq uses an image, skipping
+Building rabbitmq-producer
+Step 1/8 : FROM golang:1.12-alpine
+ ---> 6b21b4c6e7a3
+Step 2/8 : RUN apk update && apk upgrade && apk add --no-cache bash git &&go get github.com/streadway/amqp
+ ---> Using cache
+ ---> eff6c80ce5fe
+Step 3/8 : ENV SOURCES /go/src/github.com/ArturoTarinVillaescusa/go_cloud_orchestration/go_microservice_communication/rabbitmq/
+ ---> Using cache
+ ---> c8bf6de8f9b5
+Step 4/8 : COPY . ${SOURCES}
+ ---> Using cache
+ ---> dbc06b745cd6
+Step 5/8 : RUN cd ${SOURCES}producer/ && CGO_ENABLED=0 go build -o producer
+ ---> Using cache
+ ---> dbe8860a5ee8
+Step 6/8 : ENV BROKER_ADDR amqp://guest:guest@localhost:5672/
+ ---> Using cache
+ ---> c949ef5a187d
+Step 7/8 : WORKDIR ${SOURCES}producer/
+ ---> Using cache
+ ---> 3ff96d74762e
+Step 8/8 : CMD ${SOURCES}producer/producer
+ ---> Using cache
+ ---> 5e5add805f3f
+Successfully built 5e5add805f3f
+Successfully tagged rabbitmq-producer:1.0.0
+Building rabbitmq-consumer
+Step 1/8 : FROM golang:1.12-alpine
+ ---> 6b21b4c6e7a3
+Step 2/8 : RUN apk update && apk upgrade && apk add --no-cache bash git && go get github.com/streadway/amqp
+ ---> Using cache
+ ---> c8edb457e0f7
+Step 3/8 : ENV SOURCES /go/src/github.com/ArturoTarinVillaescusa/go_cloud_orchestration/go_microservice_communication/rabbitmq/
+ ---> Using cache
+ ---> 77baf45332fa
+Step 4/8 : COPY . ${SOURCES}
+ ---> Using cache
+ ---> f7cdcfcbdbd8
+Step 5/8 : RUN cd ${SOURCES}consumer/ && CGO_ENABLED=0 go build -o consumer
+ ---> Using cache
+ ---> 33c987cf4942
+Step 6/8 : ENV BROKER_ADDR amqp://guest:guest@localhost:5672/
+ ---> Using cache
+ ---> b36fc500bad0
+Step 7/8 : WORKDIR ${SOURCES}consumer/
+ ---> Using cache
+ ---> 7eb34a5df96e
+Step 8/8 : CMD ${SOURCES}consumer/consumer
+ ---> Using cache
+ ---> ec646f2a0070
+Successfully built ec646f2a0070
+Successfully tagged rabbitmq-consumer:1.0.0
+```
+
+and run the containers:
+
+```
+arturotarin@QOSMIO-X70B:~/go/src/github.com/ArturoTarinVillaescusa/go_cloud_orchestration/go_microservice_frameworks/microservice_communication/rabbitmq
+07:17:49 $ docker-compose up
+Removing rabbitmq_rabbitmq_1
+Recreating 8728c95a75d8_rabbitmq_rabbitmq_1 ... done
+Creating rabbitmq_rabbitmq-consumer_1       ... done
+Creating rabbitmq_rabbitmq-producer_1       ... done
+Attaching to rabbitmq_rabbitmq_1, rabbitmq_rabbitmq-producer_1, rabbitmq_rabbitmq-consumer_1
+rabbitmq_1           | 
+rabbitmq_1           |               RabbitMQ 3.6.9. Copyright (C) 2007-2016 Pivotal Software, Inc.
+rabbitmq_1           |   ##  ##      Licensed under the MPL.  See http://www.rabbitmq.com/
+rabbitmq_1           |   ##  ##
+rabbitmq_1           |   ##########  Logs: tty
+rabbitmq_1           |   ######  ##        tty
+rabbitmq_1           |   ##########
+rabbitmq_1           |               Starting broker...
+rabbitmq_1           | 
+rabbitmq_1           | =INFO REPORT==== 22-Jul-2019::05:18:07 ===
+rabbitmq_1           | Starting RabbitMQ 3.6.9 on Erlang 19.1
+rabbitmq_1           | Copyright (C) 2007-2016 Pivotal Software, Inc.
+rabbitmq_1           | Licensed under the MPL.  See http://www.rabbitmq.com/
+rabbitmq-producer_1  | Producing to RabbitMQ ...
+rabbitmq-consumer_1  | Consuming from RabbitMQ ...
+rabbitmq_1           | 
+rabbitmq_1           | =INFO REPORT==== 22-Jul-2019::05:18:07 ===
+rabbitmq_1           | node           : rabbit@b3714cb7907a
+rabbitmq_1           | home dir       : /var/lib/rabbitmq
+rabbitmq_1           | config file(s) : /etc/rabbitmq/rabbitmq.config
+rabbitmq_1           | cookie hash    : 3uGdESrhdBaEwjwXsVxCWw==
+rabbitmq_1           | log            : tty
+rabbitmq_1           | sasl log       : tty
+rabbitmq_1           | database dir   : /var/lib/rabbitmq/mnesia/rabbit@b3714cb7907a
+rabbitmq_1           | 
+rabbitmq_1           | =INFO REPORT==== 22-Jul-2019::05:18:09 ===
+rabbitmq_1           | Memory limit set to 6382MB of 15956MB total.
+rabbitmq_1           | 
+rabbitmq_1           | =INFO REPORT==== 22-Jul-2019::05:18:09 ===
+rabbitmq_1           | Disk free limit set to 50MB
+rabbitmq_1           | 
+rabbitmq_1           | =INFO REPORT==== 22-Jul-2019::05:18:09 ===
+rabbitmq_1           | Limiting to approx 1048476 file handles (943626 sockets)
+rabbitmq_1           | 
+rabbitmq_1           | =INFO REPORT==== 22-Jul-2019::05:18:09 ===
+rabbitmq_1           | FHC read buffering:  OFF
+rabbitmq_1           | FHC write buffering: ON
+rabbitmq_1           | 
+rabbitmq_1           | =INFO REPORT==== 22-Jul-2019::05:18:09 ===
+rabbitmq_1           | Database directory at /var/lib/rabbitmq/mnesia/rabbit@b3714cb7907a is empty. Initialising from scratch...
+rabbitmq_1           | 
+rabbitmq_1           | =INFO REPORT==== 22-Jul-2019::05:18:09 ===
+rabbitmq_1           |     application: mnesia
+rabbitmq_1           |     exited: stopped
+rabbitmq_1           |     type: temporary
+rabbitmq_1           | 
+rabbitmq_1           | =INFO REPORT==== 22-Jul-2019::05:18:12 ===
+rabbitmq_1           | Waiting for Mnesia tables for 30000 ms, 9 retries left
+rabbitmq_1           | 
+rabbitmq_1           | =INFO REPORT==== 22-Jul-2019::05:18:12 ===
+rabbitmq_1           | Waiting for Mnesia tables for 30000 ms, 9 retries left
+rabbitmq_1           | 
+rabbitmq_1           | =INFO REPORT==== 22-Jul-2019::05:18:12 ===
+rabbitmq_1           | Waiting for Mnesia tables for 30000 ms, 9 retries left
+rabbitmq_1           | 
+rabbitmq_1           | =INFO REPORT==== 22-Jul-2019::05:18:12 ===
+rabbitmq_1           | Priority queues enabled, real BQ is rabbit_variable_queue
+rabbitmq_1           | 
+rabbitmq_1           | =INFO REPORT==== 22-Jul-2019::05:18:12 ===
+rabbitmq_1           | Starting rabbit_node_monitor
+rabbitmq_1           | 
+rabbitmq_1           | =INFO REPORT==== 22-Jul-2019::05:18:12 ===
+rabbitmq_1           | Management plugin: using rates mode 'basic'
+rabbitmq_1           | 
+rabbitmq_1           | =INFO REPORT==== 22-Jul-2019::05:18:12 ===
+rabbitmq_1           | msg_store_transient: using rabbit_msg_store_ets_index to provide index
+rabbitmq_1           | 
+rabbitmq_1           | =INFO REPORT==== 22-Jul-2019::05:18:12 ===
+rabbitmq_1           | msg_store_persistent: using rabbit_msg_store_ets_index to provide index
+rabbitmq_1           | 
+rabbitmq_1           | =WARNING REPORT==== 22-Jul-2019::05:18:12 ===
+rabbitmq_1           | msg_store_persistent: rebuilding indices from scratch
+rabbitmq_1           | 
+rabbitmq_1           | =INFO REPORT==== 22-Jul-2019::05:18:12 ===
+rabbitmq_1           | Adding vhost '/'
+rabbitmq_1           | 
+rabbitmq_1           | =INFO REPORT==== 22-Jul-2019::05:18:13 ===
+rabbitmq_1           | Creating user 'guest'
+rabbitmq_1           | 
+rabbitmq_1           | =INFO REPORT==== 22-Jul-2019::05:18:13 ===
+rabbitmq_1           | Setting user tags for user 'guest' to [administrator]
+rabbitmq_1           | 
+rabbitmq_1           | =INFO REPORT==== 22-Jul-2019::05:18:13 ===
+rabbitmq_1           | Setting permissions for 'guest' in '/' to '.*', '.*', '.*'
+rabbitmq_1           | 
+rabbitmq_1           | =INFO REPORT==== 22-Jul-2019::05:18:13 ===
+rabbitmq_1           | started TCP Listener on [::]:5672
+rabbitmq_1           | 
+rabbitmq_1           | =INFO REPORT==== 22-Jul-2019::05:18:13 ===
+rabbitmq_1           | Management plugin started. Port: 15672
+rabbitmq_1           | 
+rabbitmq_1           | =INFO REPORT==== 22-Jul-2019::05:18:13 ===
+rabbitmq_1           | Statistics database started.
+rabbitmq_1           |  completed with 6 plugins.
+rabbitmq_1           | 
+rabbitmq_1           | =INFO REPORT==== 22-Jul-2019::05:18:13 ===
+rabbitmq_1           | Server startup complete; 6 plugins started.
+rabbitmq_1           |  * rabbitmq_management
+rabbitmq_1           |  * rabbitmq_management_agent
+rabbitmq_1           |  * rabbitmq_web_dispatch
+rabbitmq_1           |  * amqp_client
+rabbitmq_1           |  * cowboy
+rabbitmq_1           |  * cowlib
+rabbitmq_1           | 
+rabbitmq_1           | =INFO REPORT==== 22-Jul-2019::05:18:18 ===
+rabbitmq_1           | accepting AMQP connection <0.547.0> (192.168.48.3:52428 -> 192.168.48.2:5672)
+rabbitmq_1           | 
+rabbitmq_1           | =INFO REPORT==== 22-Jul-2019::05:18:18 ===
+rabbitmq_1           | connection <0.547.0> (192.168.48.3:52428 -> 192.168.48.2:5672): user 'guest' authenticated and granted access to vhost '/'
+rabbitmq-producer_1  | 2019/07/22 05:18:18 'Message #1' message successfully published in RabbitMQ
+rabbitmq_1           | 
+rabbitmq_1           | =INFO REPORT==== 22-Jul-2019::05:18:19 ===
+rabbitmq_1           | accepting AMQP connection <0.565.0> (192.168.48.4:39232 -> 192.168.48.2:5672)
+rabbitmq_1           | 
+rabbitmq_1           | =INFO REPORT==== 22-Jul-2019::05:18:19 ===
+rabbitmq_1           | connection <0.565.0> (192.168.48.4:39232 -> 192.168.48.2:5672): user 'guest' authenticated and granted access to vhost '/'
+rabbitmq-consumer_1  | 2019/07/22 05:18:19 Waiting for messages ...
+rabbitmq-consumer_1  | 2019/07/22 05:18:19 Received the 'Message #1' message
+rabbitmq-producer_1  | 2019/07/22 05:18:23 'Message #2' message successfully published in RabbitMQ
+rabbitmq-consumer_1  | 2019/07/22 05:18:23 Received the 'Message #2' message
+rabbitmq-producer_1  | 2019/07/22 05:18:28 'Message #3' message successfully published in RabbitMQ
+rabbitmq-consumer_1  | 2019/07/22 05:18:28 Received the 'Message #3' message
+rabbitmq-producer_1  | 2019/07/22 05:18:33 'Message #4' message successfully published in RabbitMQ
+rabbitmq-consumer_1  | 2019/07/22 05:18:33 Received the 'Message #4' message
+^CGracefully stopping... (press Ctrl+C again to force)
+Stopping rabbitmq_rabbitmq-producer_1       ... done
+Stopping rabbitmq_rabbitmq-consumer_1       ... done
+Stopping rabbitmq_rabbitmq_1                ... done
+```
+
 ## 5 Implement publish-subscribe Kafka clients
+
+In this section we've implemented a message producer and a message consumer for Kafka in Go

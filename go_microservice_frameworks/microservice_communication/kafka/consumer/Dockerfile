@@ -1,10 +1,10 @@
 FROM golang:1.12-alpine
 
-# Install git and clone the Confluent Kafka go api sources
+# Install git and clone the Confluent Kafka Go api sources
 RUN apk update && apk upgrade && apk add --no-cache bash git &&
     go get github.com/confluentinc/confluent-kafka-go/kafka
 
-ENV SOURCES /go/src/github.com/ArturoTarinVillaescusa/go_cloud_orchestration/go_microservice_communication/kafka/consumer/
+ENV SOURCES /go/src/github.com/ArturoTarinVillaescusa/go_cloud_orchestration/go_microservice_communication/kafka/
 COPY . ${SOURCES}
 
 

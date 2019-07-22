@@ -30,6 +30,7 @@ For the examples shown in this project we will be using Golang integrated with:
 * Kubernetes: for service discovery, configuration and orchestration
 * Consul: for service discovery and configuration
 * Hystrix: for circuit breaking and monitoring
+* Kafka and RabbitMQ: for coordination and communication
 
 
 **Note**

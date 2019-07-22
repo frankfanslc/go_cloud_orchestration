@@ -1,0 +1,46 @@
+version: '2'
+
+services:
+  rabbitmq:
+    image: rabbitmq:3.6.9-management-alpine
+    ports:
+      - "5671:5671"
+    environment:
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
+    networks:
+      - my-net
+
+  rabbitmq-producer:
+    build:
+      context: .
+      dockerfile: producer/Dockerfile
+    image: rabbitmq-producer:1.0.0
+    environment:
+      - BROKER_ADDR=amqp://guest:guest@rabbitmq:5672/
+      - QUEUE=test-queue
+    depends_on:
+      - rabbitmq
+    links:
+      - rabbitmq
+    networks:
+      - my-net
+
+  rabbitmq-consumer:
+    build:
+      context: .
+      dockerfile: consumer/Dockerfile
+    image: rabbitmq-consumer:1.0.0
+    environment:
+      - BROKER_ADDR=amqp://guest:guest@rabbitmq:5672/
+      - QUEUE=test-queue
+    depends_on:
+      - rabbitmq
+    links:
+      - rabbitmq
+    networks:
+      - my-net
+
+networks:
+  my-net:
+    driver: bridge
