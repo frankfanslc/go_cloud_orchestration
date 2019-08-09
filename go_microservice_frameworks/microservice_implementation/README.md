@@ -88,55 +88,120 @@ pong
 We can see how they're being logged in our Gin server:
 
 ```
-arturotarin@QOSMIO-X70B:~/go/src/github.com/ArturoTarinVillaescusa/go_cloud_orchestration/go_microservice_frameworks/microservice_implementation
-07:03:36 $ ./main 
-[GIN] 2019/07/19 - 07:04:21 | 200 |      49.348µs |       127.0.0.1 | GET      /ping
+06:09:20 $ ./microservice_implementation 
+[GIN-debug] [WARNING] Creating an Engine instance with the Logger and Recovery middleware already attached.
+
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+[GIN-debug] GET    /ping                     --> main.main.func1 (3 handlers)
+[GIN-debug] GET    /hello                    --> main.main.func2 (3 handlers)
+[GIN-debug] GET    /api/cars                 --> main.main.func3 (3 handlers)
+[GIN-debug] POST   /api/cars                 --> main.main.func4 (3 handlers)
+[GIN-debug] Loaded HTML Templates (2): 
+	- 
+	- index.html
+
+[GIN-debug] GET    /favicon.ico              --> github.com/gin-gonic/gin.(*RouterGroup).StaticFile.func1 (3 handlers)
+[GIN-debug] HEAD   /favicon.ico              --> github.com/gin-gonic/gin.(*RouterGroup).StaticFile.func1 (3 handlers)
+[GIN-debug] GET    /                         --> main.main.func5 (3 handlers)
+[GIN-debug] GET    /api/cars/:carid          --> main.main.func6 (3 handlers)
+[GIN-debug] PUT    /api/cars/:carid          --> main.main.func7 (3 handlers)
+[GIN-debug] DELETE /api/cars/:carid          --> main.main.func8 (3 handlers)
+[GIN-debug] Listening and serving HTTP on :8080
+[GIN] 2019/07/19 - 06:11:21 | 200 |      49.004µs |       127.0.0.1 | GET      /ping
 ```
 
 Getting all the cars:
 
 ```
 arturotarin@QOSMIO-X70B:~/go/src/github.com/ArturoTarinVillaescusa/go_cloud_orchestration/go_microservice_frameworks/microservice_implementation
-08:45:14 $ curl localhost:8080/api/cars
-[{"id":"0345391802","manufacturer":"Ford","model":"Galaxy"},{"id":"0000000000","manufacturer":"Porsche","model":"Carrera"}]
+08:45:14 $ curl localhost:8080/api/cars | jq 
+[
+ {
+   "id": "0345391802",
+   "manufacturer": "Ford",
+   "model": "Galaxy"
+ },
+ {
+   "id": "0000000000",
+   "manufacturer": "Porsche",
+   "model": "Carrera"
+ }
+]
 ```
 
 Adding a car and check the car has been added: 
 ```
 arturotarin@QOSMIO-X70B:~/go/src/github.com/ArturoTarinVillaescusa/go_cloud_orchestration/go_microservice_frameworks/microservice_implementation
-09:04:59 $ curl -d '{"id":"00001","manufacturer":"Renault","model":"4"}' -H "Content-Type: application/json" -X POST curl localhost:8080/api/cars
+09:04:59 $ curl -d '{"id":"00001","manufacturer":"Renault","model":"4"}' -H "Content-Type: application/json" -X POST localhost:8080/api/cars
 
 arturotarin@QOSMIO-X70B:~/go/src/github.com/ArturoTarinVillaescusa/go_cloud_orchestration/go_microservice_frameworks/microservice_implementation
 09:07:44 $ curl localhost:8080/api/cars
-[{"id":"0345391802","manufacturer":"Ford","model":"Galaxy"},{"id":"0000000000","manufacturer":"Porsche","model":"Carrera"},{"id":"00001","manufacturer":"Renault","model":"4"}]
+[
+  {
+    "id": "0345391802",
+    "manufacturer": "Ford",
+    "model": "Galaxy"
+  },
+  {
+    "id": "0000000000",
+    "manufacturer": "Porsche",
+    "model": "Carrera"
+  },
+  {
+    "id": "00001",
+    "manufacturer": "Renault",
+    "model": "4"
+  }
+]
 
 arturotarin@QOSMIO-X70B:~/go/src/github.com/ArturoTarinVillaescusa/go_cloud_orchestration/go_microservice_frameworks/microservice_implementation
-09:07:55 $ curl localhost:8080/api/cars/00001
-{"id":"00001","manufacturer":"Renault","model":"4"}
-
+09:07:55 $ curl localhost:8080/api/cars/00001 | jq
+{
+  "id": "00001",
+  "manufacturer": "Renault",
+  "model": "4"
+}
 ```
 
 Modifying a car:
 ```
 arturotarin@QOSMIO-X70B:~/go/src/github.com/ArturoTarinVillaescusa/go_cloud_orchestration/go_microservice_frameworks/microservice_implementation
-11:02:56 $ curl -d '{"id":"00001","manufacturer":"Renault","model":"6"}' -H "Content-Type: application/json" -X PUT curl localhost:8080/api/cars/00001
+11:02:56 $ curl -d '{"id":"00001","manufacturer":"Renault","model":"6"}' -H "Content-Type: application/json" -X PUT localhost:8080/api/cars/00001
 
 arturotarin@QOSMIO-X70B:~/go/src/github.com/ArturoTarinVillaescusa/go_cloud_orchestration/go_microservice_frameworks/microservice_implementation
 11:03:32 $ curl localhost:8080/api/cars/00001
-{"id":"00001","manufacturer":"Renault","model":"6"}
+{
+  "id": "00001",
+  "manufacturer": "Renault",
+  "model": "6"
+}
 ```
 
 Deleting a car:
 ```
 oservice_implementation
-11:04:54 $ curl -X DELETE curl localhost:8080/api/cars/00001curl: (6) Could not resolve host: curl
+11:04:54 $ curl -X DELETE localhost:8080/api/cars/00001
 
 arturotarin@QOSMIO-X70B:~/go/src/github.com/ArturoTarinVillaescusa/go_cloud_orchestration/go_microservice_frameworks/microservice_implementation
 11:05:45 $ curl localhost:8080/api/cars/00001
 
 arturotarin@QOSMIO-X70B:~/go/src/github.com/ArturoTarinVillaescusa/go_cloud_orchestration/go_microservice_frameworks/microservice_implementation
-11:05:49 $ curl localhost:8080/api/cars
-[{"id":"0345391802","manufacturer":"Ford","model":"Galaxy"},{"id":"0000000000","manufacturer":"Porsche","model":"Carrera"}]
+06:32:16 $ curl localhost:8080/api/cars | jq 
+[
+  {
+    "id": "0345391802",
+    "manufacturer": "Ford",
+    "model": "Galaxy"
+  },
+  {
+    "id": "0000000000",
+    "manufacturer": "Porsche",
+    "model": "Carrera"
+  }
+]
 ```
 
 ## 3 Containerizing the application with Docker

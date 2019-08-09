@@ -19,6 +19,14 @@ func main()  {
 		c.JSON(http.StatusOK, gin.H{"message": "Hello World!"})
 	})
 
+	// Serve static files and templates
+	engine.LoadHTMLGlob("./templates/*.html")
+	engine.StaticFile("/favicon.ico", "./favicon.ico")
+
+	engine.GET("/", func(c *gin.Context) {
+		c.HTML(http.StatusOK, "index.html", gin.H{"title": "Cloud implemented with Go using the Gin framework"})
+	})
+
 	// API call endpoints
 
 	// Get all cars
@@ -38,14 +46,6 @@ func main()  {
 				c.Status(http.StatusConflict)
 			}
 		}
-	})
-
-	// Serve static files and templates
-	engine.LoadHTMLGlob("./templates/*.html")
-	engine.StaticFile("/favicon.ico", "./favicon.ico")
-
-	engine.GET("/", func(c *gin.Context) {
-		c.HTML(http.StatusOK, "index.html", gin.H{"title": "Cloud implemented with Go using the Gin framework"})
 	})
 
 	// Get car by carID
