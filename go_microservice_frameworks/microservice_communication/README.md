@@ -18,7 +18,7 @@ In this block we are going to:
 
 ## 2 Implement an RPC client and server system with the ProtoBuf binary protocol
 
-To do this, first we need to download these Golang sources:
+To do this, first we need to download the ProtoBuf Golang sources:
  
 ```
 arturotarin@QOSMIO-X70B:~/go/src/github.com/ArturoTarinVillaescusa/go_cloud_orchestration/go_microservice_frameworks/microservice_communication/protobuf/proto_definition
@@ -34,7 +34,7 @@ go get: warning: modules disabled by GO111MODULE=auto in GOPATH/src;
 	see 'go help modules'
 ```
  
-Then we need to install the protoc-gen-go application:
+Then we install the protoc-gen-go application:
 
 ```
 arturotarin@QOSMIO-X70B:~/go/src/github.com/ArturoTarinVillaescusa/go_cloud_orchestration/go_microservice_frameworks/microservice_communication/protobuf/proto_definition/
@@ -147,7 +147,7 @@ Stopping protobuf_protobuf-client_1   ... done
 Stopping protobuf_protobuf-server_1   ... done
 ```
 
-## 3 Add synchronous Hystrix circuit breaker and monitor to the RPC client and server
+## 3 Add synchronous Hystrix circuit breaker and monitor the RPC client and server communication
 
 Now Let's make things more interesting: let's implement synchronous call using the Hystrix circuit breaker and add a monitoring dashboard.
 
@@ -654,7 +654,7 @@ Successfully built ad9d7d7c2351
 Successfully tagged kafka-consumer:1.0.0
 ```
 
-and run the containers:
+and run the containers. Notice the producer sending messages to a Kafka topic and the consumer consuming them:
 
 ```
 arturotarin@QOSMIO-X70B:~/go/src/github.com/ArturoTarinVillaescusa/go_cloud_orchestration/go_microservice_frameworks/microservice_communication/kafka
