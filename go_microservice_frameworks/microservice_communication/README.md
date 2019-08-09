@@ -2,8 +2,8 @@
 
 #### Table Of Contents
 1. [Document objective](#1-document-objective)
-2. [Implement an RPC client and server system with the ProtoBuf binary protocol](#2-implement-an-rpc-client-and-server-system-with-the-protobuf-binary-protocol)
-3. [Add synchronous Hystrix circuit breaker and monitor to the RPC client and server](#3-add-synchronous-hystrix-circuit-breaker-and-monitor-to-the-rpc-client-and-server)
+2. [Implement an RPC client and server system with the ProtoBuf binary protocol](#2-implement-an-rpc-client-and-server-communication-system-with-the-protobuf-binary-protocol)
+3. [Add synchronous Hystrix circuit breaker and monitor the RPC client and server](#3-add-synchronous-hystrix-circuit-breaker-and-monitor-the-rpc-client-and-server)
 4. [Implement async message queuing with RabbitMQ](#4-implement-async-message-queuing-with-rabbitmq)
 5. [Implement publish-subscribe Kafka clients](#5-implement-publish-subscribe-kafka-clients)
 
@@ -16,7 +16,7 @@ In this block we are going to:
 * Implement async message queuing with RabbitMQ
 * Implement publish-subscribe Kafka clients
 
-## 2 Implement an RPC client and server system with the ProtoBuf binary protocol
+## 2 Implement an RPC client and server communication system with the ProtoBuf binary protocol
 
 To do this, first we need to download the ProtoBuf Golang sources:
  
