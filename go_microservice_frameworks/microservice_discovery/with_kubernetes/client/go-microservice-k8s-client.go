@@ -22,7 +22,7 @@ func main()  {
 
 func initServiceUrl() {
 	// Initialize this service url from the SERVICE_URL environment variable
-	url := os.Getenv("SERVICE_URL")
+	url = os.Getenv("SERVICE_URL")
 	if len(url) == 0 {
 		url = "http://go-microservice-k8s-server:9090/info"
 	}
@@ -37,6 +37,7 @@ func callTheGreetingFunctionForeverEvery(duration time.Duration, client *http.Cl
 }
 
 func greeting(t time.Time, client *http.Client) {
+	fmt.Printf("Url in greeting equals to %s\n", url)
 	// Call the greeter server endpoint
 	response,err := client.Get(url)
 
