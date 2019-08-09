@@ -4,10 +4,10 @@ An example of how we can write cloud native applications with Golang.
 
 We will cover:
 
-* [Microservices Implementation](go_cloud_orchestration/microservice_implementation/README.md)
-* [Service discovery](go_cloud_orchestration/microservice_discovery/README.md)
-* [Configuration](go_cloud_orchestration/microservice_configuration/README.md)
-* [Comunication and coordination](go_cloud_orchestration/microservice_communication/README.md)
+* [Microservices Implementation](go_cloud_orchestration/go_microservice_frameworksmicroservice_implementation/README.md)
+* [Service discovery](go_cloud_orchestration/go_microservice_frameworks/microservice_discovery/README.md)
+* [Configuration](go_cloud_orchestration/go_microservice_frameworks/microservice_configuration/README.md)
+* [Comunication and coordination](go_cloud_orchestration/go_microservice_frameworks/microservice_communication/README.md)
 * Api gateway
 * Diagnostics and monitoring 
 
